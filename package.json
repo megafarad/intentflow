@@ -1,0 +1,42 @@
+{
+  "name": "@sirhc77/intentflow",
+  "version": "0.2.2",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "description": "",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/jexl": "^2.3.4",
+    "@types/lodash": "^4.17.20",
+    "@types/node": "^24.1.0",
+    "dotenv": "^17.2.1",
+    "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
+    "ts-jest": "^29.4.0",
+    "ts-json-schema-generator": "^2.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "chrono-node": "^2.8.3",
+    "jexl": "^2.3.0",
+    "lodash": "^4.17.21",
+    "openai": "^5.11.0",
+    "uuid": "^11.1.0"
+  }
+}
