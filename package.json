@@ -1,6 +1,6 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "types": "index.d.ts",
   "type": "module",
   "files": [
@@ -13,6 +13,7 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
       "default": "./dist/index.js"
     }
   },
