@@ -1,6 +1,6 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "main": "index.js",
   "types": "index.d.ts",
   "files": [
@@ -9,6 +9,7 @@
     "schema",
     "test"
   ],
+  "type": "module",
   "exports": {
     ".": {
       "import": "./dist/index.js",
