@@ -1,6 +1,6 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "types": "index.d.ts",
   "type": "module",
   "files": [
@@ -18,7 +18,7 @@
     }
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist --clean"
   },
   "publishConfig": {
     "access": "restricted"
@@ -38,6 +38,7 @@
     "ts-jest": "^29.4.0",
     "ts-json-schema-generator": "^2.4.0",
     "ts-node": "^10.9.2",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
