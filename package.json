@@ -1,8 +1,8 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.2.7",
-  "main": "index.js",
+  "version": "0.2.8",
   "types": "index.d.ts",
+  "type": "module",
   "files": [
     "dist",
     "src",
@@ -12,7 +12,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {
