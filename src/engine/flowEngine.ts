@@ -2,26 +2,26 @@ import {
     FlowInstruction,
     Context,
     FlowStep,
-    MediaOutput, FlowExecutionOutput, FlowConfig
+    MediaOutput, FlowExecutionOutput, FlowConfig, NoMediaOutput
 } from '../core/model';
 import {v1 as uuidv1} from 'uuid';
 import {MessageResolver} from "../render/messageResolver";
 import {StepRunner} from "./stepRunner";
-import {FlowInstanceLogger} from "../logging/flowInstanceLogger";
+import {FlowLogger} from "../logging/flowLogger";
 import {StepResolver} from "./stepResolver";
 import {
     EndCallHandler,
     FlowStepHandler,
     GatherIntentStepHandler,
     MakeCallStepHandler,
-    PlayMessageStepHandler
+    PlayMessageStepHandler, RestCallHandler, SetDataHandler
 } from "./flowStepHandler";
 
 
 export class FlowEngine {
 
     constructor(private messageResolver: MessageResolver, private stepRunner: StepRunner,
-                private logger: FlowInstanceLogger) {
+                private logger: FlowLogger) {
 
     }
 
@@ -61,7 +61,6 @@ export class FlowEngine {
         }
 
         //Get step instruction
-        //TODO: Handle setData instruction
         const nextFlowInstruction = await this.getFlowInstruction(updatedContext, nextStep);
 
         await this.logger.log({
@@ -75,11 +74,20 @@ export class FlowEngine {
 
         const nextStepName = nextStep ? nextStep.name : step.name;
 
-        return {
-            nextInstruction: nextFlowInstruction,
-            nextStepName: nextStepName,
-            updatedContext: updatedContext
-        };
+        
+
+        if (['setData', 'restCall'].includes(nextFlowInstruction.type)) {
+            const mediaOutput: NoMediaOutput = {
+                type: 'noMediaOutput'
+            }
+            return this.execStep(flowConfig, updatedContext, nextStepName, mediaOutput);
+        } else {
+            return {
+                nextInstruction: nextFlowInstruction,
+                nextStepName: nextStepName,
+                updatedContext: updatedContext
+            };
+        }
 
     }
 
@@ -106,13 +114,19 @@ export class FlowEngine {
             case 'endCall':
                 handler = new EndCallHandler();
                 break;
+            case 'setData':
+                handler = new SetDataHandler();
+                break;
+            case 'restCall':
+                handler = new RestCallHandler();
+                break;
         }
 
         return handler.handle(flowStep, context);
 
     }
 
-    public static create(logger: FlowInstanceLogger): FlowEngine {
+    public static create(logger: FlowLogger): FlowEngine {
         return new FlowEngine(new MessageResolver(), StepRunner.createOpenAIStepRunner(),
             logger);
     }

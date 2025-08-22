@@ -30,6 +30,7 @@ export interface FlowStepBase {
     type: string;
     outs?: Record<string, string>;
 }
+
 export interface GatherIntentOutputEntity {
     [key: string]: any;
 }
@@ -72,19 +73,50 @@ export interface PlayMessageStep extends FlowStepBase {
     message: Message;
 }
 
-export interface SayMessageOutput {
-    type: 'sayMessage';
+export interface NoMediaOutput {
+    type: 'noMediaOutput';
+}
+
+export interface SetDataStep extends FlowStepBase {
+    type: 'setData';
+    expressions: Record<string, string>;
+}
+
+export interface SuccessfulSetDataOutput {
+    type: 'setDataSuccess';
+    data: Record<string, any>;
+}
+
+export interface FailedSetDataOutput {
+    type: 'setDataFailure';
+    error: Error;
+}
+
+export type SetDataOutput = SuccessfulSetDataOutput | FailedSetDataOutput;
+
+export interface RestCallStep extends FlowStepBase {
+    type: 'restCall';
+    url: string;
+    headers?: Record<string, string>;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    body?: any;
+}
+
+export interface RestCallOutput {
+    type: 'restCall';
+    status: number;
+    data: any;
 }
 
 export interface EndCallStep extends FlowStepBase {
     type: 'endCall';
 }
 
-export type FlowStep = MakeCallStep | GatherIntentStep | PlayMessageStep | EndCallStep;
+export type FlowStep = MakeCallStep | GatherIntentStep | PlayMessageStep | SetDataStep | RestCallStep | EndCallStep;
 
-export type MediaOutput = CallPromptOutput | MakeCallOutput | SayMessageOutput;
+export type MediaOutput = CallPromptOutput | MakeCallOutput | NoMediaOutput;
 
-export type FlowStepOutput = GatherIntentOutput | MakeCallOutput | SayMessageOutput;
+export type FlowStepOutput = GatherIntentOutput | MakeCallOutput | NoMediaOutput | RestCallOutput | SetDataOutput;
 
 export interface FlowConfig {
     id: string;
@@ -93,6 +125,7 @@ export interface FlowConfig {
     steps: FlowStep[];
     links: Record<string, string>;
 }
+
 export interface CallPromptCallInstruction {
     type: 'callPrompt';
     play: string;
@@ -111,7 +144,10 @@ export interface EndCallInstruction {
 
 export interface SetDataInstruction {
     type: 'setData';
-    data: Record<string, any>;
+}
+
+export interface RestCallInstruction {
+    type: 'restCall';
 }
 
 export interface PlayInstruction {
@@ -120,7 +156,7 @@ export interface PlayInstruction {
 }
 
 export type FlowInstruction = CallPromptCallInstruction | InitiateCallInstruction | PlayInstruction |
-    EndCallInstruction;
+    SetDataInstruction | RestCallInstruction | EndCallInstruction;
 
 export interface FlowExecutionOutput {
     nextInstruction: FlowInstruction;

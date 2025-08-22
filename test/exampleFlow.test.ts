@@ -1,5 +1,5 @@
 import {CallPromptOutput, FlowConfig, MakeCallOutput, Context, FlowEngine} from "../src";
-import {WebSocketLogger} from "../src/logging/webSocketLogger";
+import {ConsoleFlowLogger} from "../src";
 
 const exampleFlowConfig: FlowConfig = {
     id: 'exampleFlowTest',
@@ -31,7 +31,7 @@ const exampleFlowConfig: FlowConfig = {
                 elements: [
                     {type: 'tts', text: 'This is '},
                     {type: 'dynamic', sayAs: 'text', name: 'inputRecord.clinicName'},
-                    {type: 'tts',  text: ' calling with an important render. Is this '},
+                    {type: 'tts',  text: ' calling with an important message. Is this '},
                     {type: 'dynamic', sayAs: 'text',  name: 'inputRecord.firstName'},
                     {type: 'tts', text: ' '},
                     {type: 'dynamic', sayAs: 'text', name: 'inputRecord.lastName'},
@@ -142,18 +142,30 @@ const exampleFlowConfig: FlowConfig = {
                 'proposeAppointment': 'gatherMainIntent.intent == "proposeAppointment"',
                 'other': 'gatherMainIntent.intent == "other"'
             }
+        },
+        {
+            name: 'getDateProposal',
+            type: 'setData',
+            expressions: {
+                'dateProposal': 'parseSmartDate(gatherMainIntent.entity.proposal, inputRecord.appointmentDate, "America/New_York")'
+            },
+            outs: {
+                'setDataSuccess': 'getDateProposal.type == "setDataSuccess"',
+                'setDataFailure': 'getDateProposal.type == "setDataFailure"'
+            }
         }
     ],
     links: {
         'makeCall:liveAnswer': 'rightPartyIdentification',
         'rightPartyIdentification:rightParty': 'authentication',
         'authentication:authenticated': 'gatherMainIntent',
+        'gatherMainIntent:proposeAppointment': 'getDateProposal',
     }
 }
 
 describe('FlowEngine', () => {
     it('should properly run a flow', async () => {
-        const logger = new WebSocketLogger();
+        const logger = new ConsoleFlowLogger();
         const flowEngine = FlowEngine.create(logger);
 
         const inputRecord: Record<string, any> = {

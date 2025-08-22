@@ -10,7 +10,7 @@ export interface LogEntry {
     timestamp: string;
 }
 
-export interface FlowInstanceLogger {
+export interface FlowLogger {
     log(entry: LogEntry): Promise<void>;
     flush?(): Promise<void>;
 }

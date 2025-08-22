@@ -1,4 +1,11 @@
-import {Context, FlowInstruction, FlowStep, GatherIntentStep, MakeCallStep, PlayMessageStep} from "../core/model";
+import {
+    Context,
+    FlowInstruction,
+    FlowStep,
+    GatherIntentStep,
+    MakeCallStep,
+    PlayMessageStep
+} from "../core/model";
 import {MessageResolver} from "../render/messageResolver";
 import Jexl from "jexl";
 
@@ -65,6 +72,33 @@ export class PlayMessageStepHandler implements FlowStepHandler {
             play: messageText
         }
     }
+}
+
+export class SetDataHandler implements FlowStepHandler {
+    constructor() {
+
+    }
+
+    public async handle(): Promise<FlowInstruction> {
+        return {
+            type: 'setData',
+        }
+    }
+
+}
+
+export class RestCallHandler implements FlowStepHandler {
+
+    constructor() {
+
+    }
+
+    public async handle(): Promise<FlowInstruction> {
+        return {
+            type: 'restCall'
+        }
+    }
+
 }
 
 export class EndCallHandler implements FlowStepHandler {
