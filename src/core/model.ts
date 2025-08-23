@@ -39,6 +39,7 @@ export interface GatherIntentOutput {
     type: 'gatherIntent';
     userPrompt: string;
     intent: string;
+    attempts: number;
     entity: GatherIntentOutputEntity;
 }
 

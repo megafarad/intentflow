@@ -70,13 +70,17 @@ export class StepRunner {
         const systemPrompt = this.buildSystemPrompt(step, agentPrompt);
         const userPrompt = callPromptOutput.utterance;
 
+        const currentContext = context[step.name];
+        const currentAttempt = currentContext && currentContext.attempts ? Number(currentContext.attempts) : 0;
+
         const inference = await this.inferenceRunner.run(systemPrompt, userPrompt);
 
         return {
             type: 'gatherIntent',
             intent: inference.intent,
             userPrompt: userPrompt,
-            entity: inference.entity ?? {}
+            entity: inference.entity ?? {},
+            attempts: currentAttempt + 1,
         }
 
     }

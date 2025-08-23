@@ -1,0 +1,38 @@
+name: Publish to NPM
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate package-lock.json
+        run: npm i
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          DEMO_SECRET_1: ${{ secrets.DEMO_SECRET_1 }}
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to NPM
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          access: 'private'
+          token: ${{ secrets.NPM_TOKEN }}
