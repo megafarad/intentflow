@@ -25,7 +25,7 @@ export class FlowEngine {
 
     }
 
-    public async execStep(flowConfig: FlowConfig, context: Context, stepName?: string,
+    public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, stepName?: string,
                           mediaOutput?: MediaOutput): Promise<FlowExecutionOutput> {
 
 
@@ -33,7 +33,7 @@ export class FlowEngine {
         const step = StepResolver.findStep(flowConfig, stepName);
 
         //Process step
-        const flowStepOutput = mediaOutput ? await this.stepRunner.runStep(
+        const flowStepOutput = mediaOutput ? await this.stepRunner.runStep(tenantId,
             step, mediaOutput, context) : undefined;
 
         const updatedContext: Context = flowStepOutput ? {
@@ -80,7 +80,7 @@ export class FlowEngine {
             const mediaOutput: NoMediaOutput = {
                 type: 'noMediaOutput'
             }
-            return this.execStep(flowConfig, updatedContext, nextStepName, mediaOutput);
+            return this.execStep(tenantId, flowConfig, updatedContext, nextStepName, mediaOutput);
         } else {
             return {
                 nextInstruction: nextFlowInstruction,
@@ -127,7 +127,7 @@ export class FlowEngine {
     }
 
     public static create(logger: FlowLogger): FlowEngine {
-        return new FlowEngine(new MessageResolver(), StepRunner.createOpenAIStepRunner(),
+        return new FlowEngine(new MessageResolver(), StepRunner.createDemoStepRunner(),
             logger);
     }
 }

@@ -10,7 +10,7 @@ const step: RestCallStep = {
 
 describe('restCallStep', () => {
     it('should make a rest call', async () => {
-        const stepRunner = StepRunner.createOpenAIStepRunner();
+        const stepRunner = StepRunner.createDemoStepRunner();
         const context: Context = {
             'inputRecord': {
                 'todoId': 1
@@ -19,7 +19,7 @@ describe('restCallStep', () => {
         const noMediaOutput: MediaOutput = {
             type: 'noMediaOutput'
         }
-        const stepOutput = await stepRunner.runStep(step, noMediaOutput, context);
+        const stepOutput = await stepRunner.runStep('1', step, noMediaOutput, context);
         if (stepOutput.type === 'restCall') {
             expect(stepOutput.status).toBe(200);
             expect(stepOutput.data.title).toBe('delectus aut autem');

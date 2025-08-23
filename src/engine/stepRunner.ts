@@ -4,7 +4,7 @@ import {
     Context,
     FlowStep,
     FlowStepOutput, GatherIntentOutput,
-    GatherIntentStep, SetDataStep, SetDataOutput, RestCallStep, RestCallOutput
+    GatherIntentStep, SetDataStep, SetDataOutput, RestCallStep, RestCallOutput, Headers
 } from "../core/model";
 import {MessageResolver} from "../render/messageResolver";
 import {OpenAILLM} from "../inference/openAILLM";
@@ -15,16 +15,18 @@ import Jexl from "jexl";
 import {DateTime} from "luxon";
 import {parseSmartDate} from "../inference/parseSmartDate";
 import axios, {AxiosRequestConfig} from 'axios';
+import {SecretsManager, SimpleSecretsManager} from "../secrets/secretsManager";
 
 
 export class StepRunner {
 
-    constructor(private messageResolver: MessageResolver, private inferenceRunner: InferenceRunner) {
+    constructor(private messageResolver: MessageResolver, private inferenceRunner: InferenceRunner,
+                private secretsManager: SecretsManager) {
 
     }
 
 
-    public async runStep(step: FlowStep, mediaOutput: MediaOutput,
+    public async runStep(tenantId: string, step: FlowStep, mediaOutput: MediaOutput,
                          context: Context): Promise<FlowStepOutput> {
         switch (step.type) {
             case 'makeCall':
@@ -53,7 +55,7 @@ export class StepRunner {
                 }
             case 'restCall':
                 if (mediaOutput.type === 'noMediaOutput') {
-                    return this.processRestCallStep(step, context);
+                    return this.processRestCallStep(tenantId, step, context);
                 } else {
                     throw new UnexpectedCallInstructionOutput(`Expected media output of type 'noMediaOutput', but got ${mediaOutput.type} instead.`)
                 }
@@ -105,9 +107,9 @@ Respond with JSON only. Do not include any other text or markdown.
 `
     }
 
-    public static createOpenAIStepRunner() {
+    public static createDemoStepRunner() {
         return new StepRunner(new MessageResolver(), OpenAIInferenceRunner
-            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()))
+            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager())
     }
 
     private async processSetDataStep(step: SetDataStep, context: Context): Promise<SetDataOutput> {
@@ -136,11 +138,12 @@ Respond with JSON only. Do not include any other text or markdown.
         }
     }
 
-    private async processRestCallStep(step: RestCallStep, context: Context): Promise<RestCallOutput> {
+    private async processRestCallStep(tenantId: string, step: RestCallStep, context: Context): Promise<RestCallOutput> {
         const axiosInstance = axios.create({});
         const restCallUrl = await Jexl.eval(step.url, context);
+        const stepHeaders = await this.resolveRestCallHeaders(tenantId, step.headers);
         const restCallHeaders = {
-            ...step.headers,
+            ...stepHeaders,
             'Accept': 'application/json',
         }
 
@@ -158,6 +161,26 @@ Respond with JSON only. Do not include any other text or markdown.
             status: response.status,
             data: response.data
         }
+    }
+
+    private async resolveRestCallHeaders(tenantId: string, headers?: Headers) {
+        if (headers) {
+            const resolvedHeadersPromises = Object.entries(headers).map(async ([key, value]) => {
+                switch (value.type) {
+                    case 'plain':
+                        const plainTuple: [string, string] = [key, value.value];
+                        return plainTuple;
+                    case 'secret':
+                        const resolvedSecret = await this.secretsManager.getSecret(tenantId, value.secretRef);
+                        const secretTuple: [string, string] = [key, resolvedSecret];
+                        return secretTuple;
+
+                }
+            });
+            const resolvedHeaders = await Promise.all(resolvedHeadersPromises);
+            return Object.fromEntries(resolvedHeaders);
+        }
+        return undefined;
     }
 }
 

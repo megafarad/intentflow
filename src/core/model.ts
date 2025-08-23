@@ -94,10 +94,24 @@ export interface FailedSetDataOutput {
 
 export type SetDataOutput = SuccessfulSetDataOutput | FailedSetDataOutput;
 
+export type PlainHeaderValue = {
+    type: 'plain';
+    value: string;
+};
+
+export type SecretHeaderValue = {
+    type: 'secret';
+    secretRef: string;
+};
+
+export type HeaderValue = PlainHeaderValue | SecretHeaderValue;
+
+export type Headers = Record<string, HeaderValue>;
+
 export interface RestCallStep extends FlowStepBase {
     type: 'restCall';
     url: string;
-    headers?: Record<string, string>;
+    headers?: Headers;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
     body?: any;
 }

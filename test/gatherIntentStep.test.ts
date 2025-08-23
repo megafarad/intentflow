@@ -73,9 +73,9 @@ describe('gatherIntentStep', () => {
             utterance: "I can't make it. Can we do it next Friday?"
         }
 
-        const stepRunner = StepRunner.createOpenAIStepRunner();
+        const stepRunner = StepRunner.createDemoStepRunner();
 
-        const stepOutput = await stepRunner.runStep(gatherIntentStep, callInstructionOutput, context);
+        const stepOutput = await stepRunner.runStep('1', gatherIntentStep, callInstructionOutput, context);
 
         if (stepOutput.type === 'gatherIntent') {
             expect(stepOutput.intent).toBe('proposeAppointment');

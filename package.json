@@ -1,6 +1,6 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.2.10",
+  "version": "0.3.0",
   "types": "index.d.ts",
   "files": [
     "dist",
@@ -17,15 +17,16 @@
     }
   },
   "scripts": {
-    "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist --clean"
+    "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist --clean",
+    "test": "jest"
   },
   "publishConfig": {
     "access": "restricted"
   },
   "keywords": [],
-  "author": "",
+  "author": "Chris Carrington <chris@megafarad.com> (https://megafarad.com)",
   "license": "UNLICENSED",
-  "description": "",
+  "description": "The engine behind OpeOpe's MemoMemo service.",
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/jexl": "^2.3.4",
@@ -46,6 +47,7 @@
     "chrono-node": "^2.8.3",
     "jexl": "^2.3.0",
     "lodash": "^4.17.21",
+    "lru-cache": "^11.1.0",
     "luxon": "^3.7.1",
     "openai": "^5.11.0",
     "uuid": "^11.1.0"

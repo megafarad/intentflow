@@ -167,6 +167,7 @@ describe('FlowEngine', () => {
     it('should properly run a flow', async () => {
         const logger = new ConsoleFlowLogger();
         const flowEngine = FlowEngine.create(logger);
+        const tenantId = '1';
 
         const inputRecord: Record<string, any> = {
             clinicName: 'Sunshine Medical',
@@ -183,7 +184,7 @@ describe('FlowEngine', () => {
             'inputRecord': inputRecord
         }
 
-        const firstFlowExecutionOutput = await flowEngine.execStep(exampleFlowConfig, initialContext);
+        const firstFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig, initialContext);
 
         if (firstFlowExecutionOutput.nextInstruction.type === 'initiateCall') {
             expect(firstFlowExecutionOutput.nextInstruction.to).toBe('+12065551234');
@@ -196,7 +197,7 @@ describe('FlowEngine', () => {
             result: 'LA'
         }
 
-        const secondFlowExecutionOutput = await flowEngine.execStep(exampleFlowConfig,
+        const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             firstFlowExecutionOutput.updatedContext, firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
         expect(secondFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
@@ -206,7 +207,7 @@ describe('FlowEngine', () => {
             utterance: "Yes."
         }
 
-        const thirdFlowExecutionOutput = await flowEngine.execStep(exampleFlowConfig,
+        const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             secondFlowExecutionOutput.updatedContext, secondFlowExecutionOutput.nextStepName, secondStepOutput);
 
         expect(thirdFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
@@ -216,7 +217,7 @@ describe('FlowEngine', () => {
             utterance: "August First Nineteen Seventy Seven"
         }
 
-        const fourthFlowExecutionOutput = await flowEngine.execStep(exampleFlowConfig,
+        const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             thirdFlowExecutionOutput.updatedContext, thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
 
         expect(fourthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
@@ -226,7 +227,7 @@ describe('FlowEngine', () => {
             utterance: "I can't make it. Can we do it next Friday?"
         }
 
-        const fifthFlowExecutionOutput = await flowEngine.execStep(exampleFlowConfig,
+        const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
 
         expect(fifthFlowExecutionOutput.nextInstruction.type).toBe('endCall');
