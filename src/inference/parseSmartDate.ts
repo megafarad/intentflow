@@ -64,9 +64,10 @@ function parseSmartTime(input: string, anchorDate: DateTime): ParsedTime | undef
             if (end) {
                 const endDateTime= DateTime.fromJSDate(end, {zone: anchorDate.zone});
                 if (startDateTime.toISOTime() && endDateTime.toISOTime()) {
+                    console.log(startDateTime.toISOTime(), endDateTime.toISOTime());
                     return {
-                        fromTime: startDateTime.toLocaleString(DateTime.TIME_24_SIMPLE),
-                        toTime: endDateTime.toLocaleString(DateTime.TIME_24_SIMPLE)
+                        fromTime: startDateTime.toFormat('HH:mm'),
+                        toTime: endDateTime.toFormat('HH:mm')
                     }
                 } else {
                     return undefined;
@@ -74,7 +75,8 @@ function parseSmartTime(input: string, anchorDate: DateTime): ParsedTime | undef
             } else {
                 const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
                 if (startDateTime.toISOTime()) {
-                    return startDateTime.toLocaleString(DateTime.TIME_24_SIMPLE);
+                    console.log(startDateTime.toISOTime());
+                    return startDateTime.toFormat('HH:mm');
                 } else {
                     return undefined;
                 }
