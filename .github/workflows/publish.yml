@@ -34,5 +34,5 @@ jobs:
       - name: Publish to NPM
         uses: JS-DevTools/npm-publish@v3
         with:
-          access: 'private'
+          access: 'restricted'
           token: ${{ secrets.NPM_TOKEN }}
