@@ -59,12 +59,11 @@ function parseSmartTime(input: string, anchorDate: DateTime): ParsedTime | undef
             timezone: anchorDate.toFormat('ZZZZ')});
         if (parsed.length > 0) {
             const start = parsed[0].start.date();
-            const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
+            const startDateTime = DateTime.fromJSDate(start);
             const end = parsed[0].end?.date();
             if (end) {
-                const endDateTime= DateTime.fromJSDate(end, {zone: anchorDate.zone});
+                const endDateTime= DateTime.fromJSDate(end);
                 if (startDateTime.toISOTime() && endDateTime.toISOTime()) {
-                    console.log(startDateTime.toISOTime(), endDateTime.toISOTime());
                     return {
                         fromTime: startDateTime.toFormat('HH:mm'),
                         toTime: endDateTime.toFormat('HH:mm')
@@ -73,9 +72,8 @@ function parseSmartTime(input: string, anchorDate: DateTime): ParsedTime | undef
                     return undefined;
                 }
             } else {
-                const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
+                const startDateTime = DateTime.fromJSDate(start);
                 if (startDateTime.toISOTime()) {
-                    console.log(startDateTime.toISOTime());
                     return startDateTime.toFormat('HH:mm');
                 } else {
                     return undefined;
