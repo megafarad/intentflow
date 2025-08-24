@@ -55,7 +55,8 @@ function parseSmartTime(input: string, anchorDate: DateTime): ParsedTime | undef
             toTime: '00:00'
         }
     } else {
-        const parsed = chrono.parse(input, anchorDate.toJSDate());
+        const parsed = chrono.parse(input, {instant: anchorDate.toJSDate(),
+            timezone: anchorDate.toFormat('ZZZZ')});
         if (parsed.length > 0) {
             const start = parsed[0].start.date();
             const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
@@ -105,10 +106,12 @@ export function parseSmartDate(input: string, anchorDate: DateTime): ParseResult
     const monthMatch = lower.match(/\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/);
     if (monthMatch) {
         const monthName = monthMatch[1];
-        const parsed = chrono.parse(`${monthName} 1`, anchorDate.toJSDate());
+        const parsed = chrono.parse(`${monthName} 1`, {instant: anchorDate.toJSDate(),
+            timezone: anchorDate.toFormat('ZZZZ')});
 
         if (parsed.length > 0) {
-            const firstDay = DateTime.fromJSDate(parsed[0].start.date(), {zone: anchorDate.zone});
+            const firstDay = DateTime.fromJSDate(parsed[0].start.date(),
+                {zone: anchorDate.zone});
             const lastDay = firstDay.endOf('month');
             return {
                 fromDate: toISOString(firstDay),
@@ -119,7 +122,9 @@ export function parseSmartDate(input: string, anchorDate: DateTime): ParseResult
     }
 
     //3. Default chrono parsing (with forward bias)
-    const results = chrono.parse(input, anchorDate.toJSDate(), {forwardDate: true});
+
+    const results = chrono.parse(input, {instant: anchorDate.toJSDate(),
+            timezone: anchorDate.toFormat('ZZZZ')}, {forwardDate: true});
     if (results.length > 0) {
         const start = DateTime.fromJSDate(results[0].start.date(), {zone: anchorDate.zone});
         const end =  results[0].end?.date() ?
