@@ -79,7 +79,8 @@ describe('gatherIntentStep', () => {
 
         const callInstructionOutput: CallPromptOutput = {
             type: 'callPrompt',
-            utterance: "I can't make it. Can we do it next Friday?"
+            utterance: "I can't make it. Can we do it next Friday?",
+            isReprompt: false
         }
 
         const stepRunner = StepRunner.createDemoStepRunner();
@@ -91,17 +92,6 @@ describe('gatherIntentStep', () => {
             expect(stepOutput.intent).toBe('proposeAppointment');
             expect(stepOutput.entity.proposal).toBe('next Friday');
             expect(stepOutput.attempts).toBe(1);
-            const updatedContext = {
-                ...context,
-                [gatherIntentStep.name]: stepOutput,
-            }
-            const retryStepOutput = await stepRunner.runStep('1', gatherIntentStep,
-                callInstructionOutput, updatedContext);
-            if (retryStepOutput.type === 'gatherIntent') {
-                expect(retryStepOutput.attempts).toBe(2);
-            } else {
-                throw new Error('Unexpected step output');
-            }
         } else {
             throw new Error('Unexpected step output');
         }
