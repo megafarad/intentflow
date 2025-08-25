@@ -74,17 +74,18 @@ export class FlowEngine {
             timestamp: new Date().toISOString()
         });
 
-        const nextStepName = nextStep ? nextStep.name : step.name;
+        const executionStep = nextStep ? nextStep : step;
 
         if (['setData', 'restCall'].includes(nextFlowInstruction.type)) {
             const mediaOutput: NoMediaOutput = {
                 type: 'noMediaOutput'
             }
-            return this.execStep(tenantId, flowConfig, updatedContext, nextStepName, mediaOutput);
+            return this.execStep(tenantId, flowConfig, updatedContext, executionStep.name, mediaOutput);
         } else {
             return {
                 nextInstruction: nextFlowInstruction,
-                nextStepName: nextStepName,
+                nextStepName: executionStep.name,
+                nextStepType: executionStep.type,
                 updatedContext: updatedContext
             };
         }

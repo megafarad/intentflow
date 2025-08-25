@@ -25,9 +25,11 @@ export interface Intent {
     criteria: string;
 }
 
+export type FlowStepType = 'gatherIntent' | 'makeCall' | 'playMessage' | 'setData' | 'restCall' | 'endCall';
+
 export interface FlowStepBase {
     name: string;
-    type: string;
+    type: FlowStepType;
     outs?: Record<string, string>;
 }
 
@@ -193,6 +195,7 @@ export type FlowInstruction =
 export interface FlowExecutionOutput {
     nextInstruction: FlowInstruction;
     nextStepName: string;
+    nextStepType: FlowStepType;
     updatedContext: Context;
 }
 
