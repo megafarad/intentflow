@@ -46,6 +46,7 @@ export interface GatherIntentOutput {
 export interface CallPromptOutput {
     type: 'callPrompt';
     utterance: string;
+    isReprompt: boolean;
 }
 
 export interface GatherIntentStep extends FlowStepBase {
@@ -55,6 +56,11 @@ export interface GatherIntentStep extends FlowStepBase {
     intents: Intent[];
     entityExtractionInstructions?: string;
     additionalInstructions?: string;
+    repeat?: {
+        condition: string;
+        message?: Message;
+        attempts: number;
+    }
 }
 
 export interface MakeCallStep extends FlowStepBase {
@@ -170,8 +176,19 @@ export interface PlayInstruction {
     play: string;
 }
 
-export type FlowInstruction = CallPromptCallInstruction | InitiateCallInstruction | PlayInstruction |
-    SetDataInstruction | RestCallInstruction | EndCallInstruction;
+export interface RepeatInstruction {
+    type: 'repeat';
+    play: string;
+}
+
+export type FlowInstruction =
+    CallPromptCallInstruction
+    | InitiateCallInstruction
+    | PlayInstruction
+    | RepeatInstruction
+    | SetDataInstruction
+    | RestCallInstruction
+    | EndCallInstruction;
 
 export interface FlowExecutionOutput {
     nextInstruction: FlowInstruction;

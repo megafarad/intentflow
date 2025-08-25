@@ -17,17 +17,19 @@ export class StepResolver {
         return foundStep;
     }
 
-    public static findNextStep(flow: FlowConfig, context: Context, flowStep: FlowStep, flowStepOutput?: FlowStepOutput) {
-        if (!flowStepOutput) {
-            if (flowStep.type in ['gatherIntent', 'makeCall']) {
-                throw new NoStepOutputProvidedError(`No step output provided for flow step ${flowStep.name}`);
-            }
-        } else {
-            context[flowStep.name] = flowStepOutput;
+    public static resolveStep(flow: FlowConfig, context: Context, flowStep: FlowStep, flowStepOutput?: FlowStepOutput) {
+        if (flowStepOutput?.type === 'noMediaOutput' && flowStep.type === 'gatherIntent') {
+            return flowStep;
         }
         const matchingCondition = flowStep.outs ? Object.entries(flowStep.outs)
             .find(([_, condition]) => {
-                return Jexl.evalSync(condition, context);
+                try {
+                    return Boolean(Jexl.evalSync(condition, context));
+                } catch (err) {
+                    console.error(`Error evaluating condition for flow step ${flowStep.name}: ${condition}`);
+                    throw err;
+                }
+
             }) : undefined;
 
         if (matchingCondition) {
@@ -36,6 +38,20 @@ export class StepResolver {
             return flow.steps.find(step => step.name === nextStepName);
         }
         return undefined;
+    }
+
+    public static async doRepeatStep(flowStep: FlowStep, flowStepOutput: FlowStepOutput, context: Context) {
+        if (flowStep.type === 'gatherIntent' && flowStepOutput.type === 'gatherIntent' && flowStep.repeat) {
+            try {
+                const evaluation = await Jexl.eval(flowStep.repeat.condition, context);
+                const meetsCondition = Boolean(evaluation);
+                const maxAttempts = flowStepOutput.attempts >= flowStep.repeat.attempts;
+                return meetsCondition && !maxAttempts;
+            } catch (err) {
+                console.error(`Error evaluating condition for flow step ${flowStep.name}: ${flowStep.repeat.condition}`);
+                throw err;
+            }
+        } else return false;
     }
 
     public static findInitialStep(flow: FlowConfig) {

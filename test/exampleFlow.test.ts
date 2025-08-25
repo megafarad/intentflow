@@ -1,4 +1,11 @@
-import {CallPromptOutput, FlowConfig, MakeCallOutput, Context, FlowEngine} from "../src";
+import {
+    CallPromptOutput,
+    FlowConfig,
+    MakeCallOutput,
+    Context,
+    FlowEngine,
+    NoMediaOutput
+} from "../src";
 import {ConsoleFlowLogger} from "../src";
 
 const exampleFlowConfig: FlowConfig = {
@@ -131,9 +138,19 @@ const exampleFlowConfig: FlowConfig = {
             ,
             additionalInstructions: "Again, DO NOT assign the intent as \"unableToMakeAppointment\" if the user " +
                 "proposes an alternative date and/or time for the appointment. Instead, assign the intent as " +
-                "\"proposeAppointment\"."
-            ,
-
+                "\"proposeAppointment\".",
+            repeat: {
+                condition: 'gatherMainIntent.intent == "other"',
+                message: {
+                    elements: [
+                        {
+                            type: "tts",
+                            text: "I'm sorry, I did not understand your response."
+                        }
+                    ]
+                },
+                attempts: 3
+            },
             outs: {
                 'confirmAppointment': 'gatherMainIntent.intent == "confirmAppointment"',
                 'cancelAppointment': 'gatherMainIntent.intent == "cancelAppointment"',
@@ -204,7 +221,8 @@ describe('FlowEngine', () => {
 
         const secondStepOutput: CallPromptOutput = {
             type: 'callPrompt',
-            utterance: "Yes."
+            utterance: "Yes.",
+            isReprompt: false
         }
 
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
@@ -214,7 +232,8 @@ describe('FlowEngine', () => {
 
         const thirdStepOutput: CallPromptOutput = {
             type: 'callPrompt',
-            utterance: "August First Nineteen Seventy Seven"
+            utterance: "August First Nineteen Seventy Seven",
+            isReprompt: false
         }
 
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
@@ -224,7 +243,8 @@ describe('FlowEngine', () => {
 
         const fourthStepOutput: CallPromptOutput = {
             type: 'callPrompt',
-            utterance: "I can't make it. Can we do it next Friday?"
+            utterance: "I can't make it. Can we do it next Friday?",
+            isReprompt: false
         }
 
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
@@ -232,4 +252,95 @@ describe('FlowEngine', () => {
 
         expect(fifthFlowExecutionOutput.nextInstruction.type).toBe('endCall');
     }, 10000);
+
+    it('should properly run a flow with a repeat', async () => {
+        const logger = new ConsoleFlowLogger();
+        const flowEngine = FlowEngine.create(logger);
+        const tenantId = '1';
+        const inputRecord: Record<string, any> = {
+            clinicName: 'Sunshine Medical',
+            firstName: 'Chris',
+            lastName: 'Carrington',
+            phoneNumber: '2065551234',
+            dateOfBirth: '1977-08-01',
+            appointmentDate: '2025-08-08',
+            appointmentTime: '10:00',
+            practitioner: 'John Doe',
+        }
+        const initialContext: Context = {
+            'inputRecord': inputRecord
+        }
+        const firstFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            initialContext);
+
+        if (firstFlowExecutionOutput.nextInstruction.type === 'initiateCall') {
+            expect(firstFlowExecutionOutput.nextInstruction.to).toBe('+12065551234');
+        } else {
+            throw new Error('Unexpected flow instruction');
+        }
+
+        const firstStepOutput: MakeCallOutput = {
+            type: 'makeCall',
+            result: 'LA'
+        }
+
+        const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            firstFlowExecutionOutput.updatedContext, firstFlowExecutionOutput.nextStepName, firstStepOutput);
+
+        expect(secondFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+
+        const secondStepOutput: CallPromptOutput = {
+            type: 'callPrompt',
+            utterance: "Yes.",
+            isReprompt: false
+        }
+
+        const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            secondFlowExecutionOutput.updatedContext, secondFlowExecutionOutput.nextStepName, secondStepOutput);
+
+        expect(thirdFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+
+        const thirdStepOutput: CallPromptOutput = {
+            type: 'callPrompt',
+            utterance: "August First Nineteen Seventy Seven",
+            isReprompt: false
+        }
+        const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            thirdFlowExecutionOutput.updatedContext, thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
+
+        expect(fourthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+
+        const fourthStepOutput: CallPromptOutput = {
+            type: 'callPrompt',
+            utterance: "Is this for the dentist or the orthopedic surgeon?",
+            isReprompt: false
+        }
+        const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
+
+        expect(fifthFlowExecutionOutput.nextInstruction.type).toBe('repeat');
+        expect(fifthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
+
+        const fifthStepOutput: NoMediaOutput = {
+            type: 'noMediaOutput',
+        }
+
+        const sixthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            fifthFlowExecutionOutput.updatedContext, fifthFlowExecutionOutput.nextStepName, fifthStepOutput);
+
+        expect(sixthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(sixthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
+
+        const sixthStepOutput: CallPromptOutput = {
+            type: 'callPrompt',
+            utterance: "I can't make it. Can we do it next Friday?",
+            isReprompt: true
+        }
+
+        const seventhFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            sixthFlowExecutionOutput.updatedContext, sixthFlowExecutionOutput.nextStepName, sixthStepOutput);
+
+        expect(seventhFlowExecutionOutput.nextInstruction.type).toBe('endCall');
+
+    }, 20000);
 });

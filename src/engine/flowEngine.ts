@@ -14,7 +14,7 @@ import {
     FlowStepHandler,
     GatherIntentStepHandler,
     MakeCallStepHandler,
-    PlayMessageStepHandler, RestCallHandler, SetDataHandler
+    PlayMessageStepHandler, RepeatGatherIntentStepHandler, RestCallHandler, SetDataHandler
 } from "./flowStepHandler";
 
 
@@ -36,7 +36,7 @@ export class FlowEngine {
         const flowStepOutput = mediaOutput ? await this.stepRunner.runStep(tenantId,
             step, mediaOutput, context) : undefined;
 
-        const updatedContext: Context = flowStepOutput ? {
+        const updatedContext: Context = flowStepOutput && flowStepOutput.type !== 'noMediaOutput' ? {
             ...context,
             [step.name]: flowStepOutput
         } : context;
@@ -52,16 +52,18 @@ export class FlowEngine {
             });
         }
 
-        const foundNextStep = StepResolver.findNextStep(flowConfig, updatedContext, step,
+        const doRepeat = flowStepOutput ? await StepResolver.doRepeatStep(step, flowStepOutput, updatedContext) : false;
+
+        const resolvedStep = doRepeat ? step : StepResolver.resolveStep(flowConfig, updatedContext, step,
             flowStepOutput);
-        const nextStep: FlowStep = foundNextStep ? foundNextStep : (!stepName) ? StepResolver
+        const nextStep: FlowStep = resolvedStep ? resolvedStep : (!stepName) ? StepResolver
             .findInitialStep(flowConfig) : {
             name: stepName,
             type: 'endCall'
         }
 
         //Get step instruction
-        const nextFlowInstruction = await this.getFlowInstruction(updatedContext, nextStep);
+        const nextFlowInstruction = await this.getFlowInstruction(updatedContext, doRepeat, nextStep);
 
         await this.logger.log({
             id: uuidv1(),
@@ -73,8 +75,6 @@ export class FlowEngine {
         });
 
         const nextStepName = nextStep ? nextStep.name : step.name;
-
-        
 
         if (['setData', 'restCall'].includes(nextFlowInstruction.type)) {
             const mediaOutput: NoMediaOutput = {
@@ -91,7 +91,7 @@ export class FlowEngine {
 
     }
 
-    private async getFlowInstruction(context: Context, flowStep?: FlowStep): Promise<FlowInstruction> {
+    private async getFlowInstruction(context: Context, isRepeat: boolean, flowStep?: FlowStep): Promise<FlowInstruction> {
 
         if (!flowStep) {
             return {
@@ -103,8 +103,13 @@ export class FlowEngine {
 
         switch (flowStep.type) {
             case 'gatherIntent':
-                handler = new GatherIntentStepHandler(this.messageResolver);
-                break;
+                if (isRepeat) {
+                    handler = new RepeatGatherIntentStepHandler(this.messageResolver);
+                    break;
+                } else {
+                    handler = new GatherIntentStepHandler(this.messageResolver);
+                    break;
+                }
             case 'makeCall':
                 handler = new MakeCallStepHandler();
                 break;
