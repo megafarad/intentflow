@@ -122,7 +122,7 @@ export interface RestCallStep extends FlowStepBase {
     url: string;
     headers?: Headers;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    body?: any;
+    body?: string;
 }
 
 export interface RestCallOutput {

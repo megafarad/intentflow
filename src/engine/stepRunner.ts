@@ -149,6 +149,9 @@ Respond with JSON only. Do not include any other text or markdown.
     private async processRestCallStep(tenantId: string, step: RestCallStep, context: Context): Promise<RestCallOutput> {
         const axiosInstance = axios.create({});
         const restCallUrl = await Jexl.eval(step.url, context);
+        const resolvedBody = step.body ? await Jexl.eval(step.body, context) : undefined;
+        const bodyString = resolvedBody ? String(resolvedBody) : undefined;
+        const bodyData = bodyString ? JSON.parse(bodyString) : undefined;
         const stepHeaders = await this.resolveRestCallHeaders(tenantId, step.headers);
         const restCallHeaders = {
             ...stepHeaders,
@@ -159,7 +162,7 @@ Respond with JSON only. Do not include any other text or markdown.
             url: restCallUrl,
             headers: restCallHeaders,
             method: step.method,
-            data: step.body
+            data: bodyData
         }
 
         const response = await axiosInstance.request(axiosCallOpts);
