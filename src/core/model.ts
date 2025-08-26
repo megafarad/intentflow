@@ -117,12 +117,28 @@ export type HeaderValue = PlainHeaderValue | SecretHeaderValue;
 
 export type Headers = Record<string, HeaderValue>;
 
+export interface StaticRestBodyValue {
+    type: 'static';
+    value: any;
+}
+
+export interface DynamicRestBodyValue {
+    type: 'dynamic';
+    name: string;
+}
+
+export type RestBodyValue = StaticRestBodyValue | DynamicRestBodyValue;
+
+export interface RestBody {
+    [key: string]: RestBodyValue | RestBody;
+}
+
 export interface RestCallStep extends FlowStepBase {
     type: 'restCall';
     url: string;
     headers?: Headers;
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    body?: string;
+    body?: RestBody;
 }
 
 export interface RestCallOutput {

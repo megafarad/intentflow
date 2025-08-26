@@ -4,7 +4,7 @@ import {
     Context,
     FlowStep,
     FlowStepOutput, GatherIntentOutput,
-    GatherIntentStep, SetDataStep, SetDataOutput, RestCallStep, RestCallOutput, Headers
+    GatherIntentStep, SetDataStep, SetDataOutput, RestCallStep, RestCallOutput, Headers, RestBody
 } from "../core/model";
 import {MessageResolver} from "../render/messageResolver";
 import {OpenAILLM} from "../inference/openAILLM";
@@ -149,9 +149,7 @@ Respond with JSON only. Do not include any other text or markdown.
     private async processRestCallStep(tenantId: string, step: RestCallStep, context: Context): Promise<RestCallOutput> {
         const axiosInstance = axios.create({});
         const restCallUrl = await Jexl.eval(step.url, context);
-        const resolvedBody = step.body ? await Jexl.eval(step.body, context) : undefined;
-        const bodyString = resolvedBody ? String(resolvedBody) : undefined;
-        const bodyData = bodyString ? JSON.parse(bodyString) : undefined;
+        const resolvedBody =  step.body ? this.resolveRestCallBody(step.body, context) : undefined;
         const stepHeaders = await this.resolveRestCallHeaders(tenantId, step.headers);
         const restCallHeaders = {
             ...stepHeaders,
@@ -162,7 +160,7 @@ Respond with JSON only. Do not include any other text or markdown.
             url: restCallUrl,
             headers: restCallHeaders,
             method: step.method,
-            data: bodyData
+            data: resolvedBody
         }
 
         const response = await axiosInstance.request(axiosCallOpts);
@@ -192,6 +190,22 @@ Respond with JSON only. Do not include any other text or markdown.
             return Object.fromEntries(resolvedHeaders);
         }
         return undefined;
+    }
+
+    private resolveRestCallBody(body: RestBody, context: Context): { [p: string]: any } {
+        const entries: ([string, any])[] = Object.entries(body).map(([key, value]) => {
+            if (value.type === 'static') {
+                const tuple: [string, any] = [key, value.value];
+                return tuple;
+            } else if (value.type === 'dynamic') {
+                const tuple: [string, any] = [key, Jexl.evalSync(value.name, context)];
+                return tuple;
+            } else {
+                const tuple: [string, any] = [key, this.resolveRestCallBody(value, context)];
+                return tuple;
+            }
+        });
+        return Object.fromEntries(entries);
     }
 }
 
