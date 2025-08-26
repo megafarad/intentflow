@@ -145,6 +145,7 @@ export interface RestCallOutput {
     type: 'restCall';
     status: number;
     data: any;
+    error?: Error;
 }
 
 export interface EndCallStep extends FlowStepBase {

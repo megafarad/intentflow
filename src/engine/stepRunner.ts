@@ -57,7 +57,30 @@ export class StepRunner {
                 }
             case 'restCall':
                 if (mediaOutput.type === 'noMediaOutput') {
-                    return this.processRestCallStep(tenantId, step, context);
+                    try {
+                        return this.processRestCallStep(tenantId, step, context);
+                    } catch (e) {
+                        if (e instanceof Error) {
+                            return {
+                                type: 'restCall',
+                                status: 500,
+                                data: {
+                                    error: 'Internal Server Error'
+                                },
+                                error: e
+                            }
+                        } else {
+                            return {
+                                type: 'restCall',
+                                status: 500,
+                                data: {
+                                    error: 'Internal Server Error'
+                                },
+                                error: new Error('Unknown error')
+                            }
+                        }
+                    }
+
                 } else {
                     throw new UnexpectedCallInstructionOutput(`Expected media output of type 'noMediaOutput', but got ${mediaOutput.type} instead.`)
                 }
@@ -160,7 +183,8 @@ Respond with JSON only. Do not include any other text or markdown.
             url: restCallUrl,
             headers: restCallHeaders,
             method: step.method,
-            data: resolvedBody
+            data: resolvedBody,
+            validateStatus: () => true
         }
 
         const response = await axiosInstance.request(axiosCallOpts);
@@ -168,7 +192,7 @@ Respond with JSON only. Do not include any other text or markdown.
         return {
             type: 'restCall',
             status: response.status,
-            data: response.data
+            data: response.data,
         }
     }
 
