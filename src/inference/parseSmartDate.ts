@@ -70,12 +70,11 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
     } else if (replacedSpokenNumbers.includes('after') && !replacedSpokenNumbers.includes('afternoon')) {
         const timePart = replacedSpokenNumbers.split('after')[1];
         const parsed = chrono.parse(`at ${timePart}`, {
-            instant: anchorDate.toJSDate(),
-            timezone: anchorDate.toFormat('ZZZZ')
+            instant: anchorDate.toJSDate()
         });
         if (parsed.length > 0) {
             const start = parsed[0].start.date();
-            const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
+            const startDateTime = DateTime.fromJSDate(start);
             const startDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(startDateTime) : startDateTime;
             if (startDateTimeWithBias.toISOTime()) {
                 return {
@@ -87,12 +86,11 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
     } else if (replacedSpokenNumbers.includes('before')) {
         const timePart = replacedSpokenNumbers.split('before')[1];
         const parsed = chrono.parse(`at ${timePart}`, {
-            instant: anchorDate.toJSDate(),
-            timezone: anchorDate.toFormat('ZZZZ')
+            instant: anchorDate.toJSDate()
         });
         if (parsed.length > 0) {
             const end = parsed[0].start.date();
-            const endDateTime = DateTime.fromJSDate(end, {zone: anchorDate.zone});
+            const endDateTime = DateTime.fromJSDate(end);
             const endDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(endDateTime) : endDateTime;
             if (endDateTimeWithBias.toISOTime()) {
                 return {
@@ -104,8 +102,7 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
     } else if (replacedSpokenNumbers.includes('between')) {
         const timeParts = replacedSpokenNumbers.split('between')[1].split('and');
         const parsedStart = chrono.parse(`at ${timeParts[0]}`, {
-            instant: anchorDate.toJSDate(),
-            timezone: anchorDate.toFormat('ZZZZ')
+            instant: anchorDate.toJSDate()
         });
         const parsedEnd = chrono.parse(`at ${timeParts[1]}`, {
             instant: anchorDate.toJSDate(),
@@ -113,10 +110,10 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
         });
         if (parsedStart.length > 0 && parsedEnd.length > 0) {
             const start = parsedStart[0].start.date();
-            const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
+            const startDateTime = DateTime.fromJSDate(start);
             const startDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(startDateTime) : startDateTime;
             const end = parsedEnd[0].start.date();
-            const endDateTime = DateTime.fromJSDate(end, {zone: anchorDate.zone});
+            const endDateTime = DateTime.fromJSDate(end);
             const endDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(endDateTime) : endDateTime;
             if (startDateTimeWithBias.toISOTime() && endDateTimeWithBias.toISOTime()) {
                 return {
@@ -126,7 +123,6 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
             }
         }
     } else {
-
         const parsed = chrono.parse(replacedSpokenNumbers, {
             instant: anchorDate.toJSDate(),
             timezone: anchorDate.toFormat('ZZZZ')
