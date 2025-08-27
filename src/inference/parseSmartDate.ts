@@ -105,8 +105,7 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
             instant: anchorDate.toJSDate()
         });
         const parsedEnd = chrono.parse(`at ${timeParts[1]}`, {
-            instant: anchorDate.toJSDate(),
-            timezone: anchorDate.toFormat('ZZZZ')
+            instant: anchorDate.toJSDate()
         });
         if (parsedStart.length > 0 && parsedEnd.length > 0) {
             const start = parsedStart[0].start.date();
@@ -124,8 +123,7 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
         }
     } else {
         const parsed = chrono.parse(replacedSpokenNumbers, {
-            instant: anchorDate.toJSDate(),
-            timezone: anchorDate.toFormat('ZZZZ')
+            instant: anchorDate.toJSDate()
         });
         if (parsed.length > 0) {
             const start = parsed[0].start.date();
@@ -188,13 +186,11 @@ export function parseSmartDate(input: string, anchorDate: DateTime, businessHour
     if (monthMatch) {
         const monthName = monthMatch[1];
         const parsed = chrono.parse(`${monthName} 1`, {
-            instant: anchorDate.toJSDate(),
-            timezone: anchorDate.toFormat('ZZZZ')
+            instant: anchorDate.toJSDate()
         });
 
         if (parsed.length > 0) {
-            const firstDay = DateTime.fromJSDate(parsed[0].start.date(),
-                {zone: anchorDate.zone});
+            const firstDay = DateTime.fromJSDate(parsed[0].start.date());
             const lastDay = firstDay.endOf('month');
             return {
                 fromDate: toISOString(firstDay),
@@ -207,13 +203,12 @@ export function parseSmartDate(input: string, anchorDate: DateTime, businessHour
     //3. Default chrono parsing (with forward bias)
 
     const results = chrono.parse(input, {
-        instant: anchorDate.toJSDate(),
-        timezone: anchorDate.toFormat('ZZZZ')
+        instant: anchorDate.toJSDate()
     }, {forwardDate: true});
     if (results.length > 0) {
-        const start = DateTime.fromJSDate(results[0].start.date(), {zone: anchorDate.zone});
+        const start = DateTime.fromJSDate(results[0].start.date());
         const end = results[0].end?.date() ?
-            DateTime.fromJSDate(results[0].end.date(), {zone: anchorDate.zone}) : undefined;
+            DateTime.fromJSDate(results[0].end.date()) : undefined;
         if (start && end) {
             return {
                 fromDate: toISOString(start),

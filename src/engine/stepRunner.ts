@@ -144,8 +144,8 @@ Respond with JSON only. Do not include any other text or markdown.
     }
 
     private async processSetDataStep(step: SetDataStep, context: Context): Promise<SetDataOutput> {
-        Jexl.addFunction('parseSmartDate', (input: string, anchorDateString: string, timeZone: string, businessHourBias?: boolean) => {
-            const anchorDate = DateTime.fromISO(anchorDateString).setZone(timeZone);
+        Jexl.addFunction('parseSmartDate', (input: string, anchorDateString: string, businessHourBias?: boolean) => {
+            const anchorDate = DateTime.fromISO(anchorDateString);
             return parseSmartDate(input, anchorDate, businessHourBias);
         });
 

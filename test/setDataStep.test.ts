@@ -8,8 +8,8 @@ describe('SetDataStep', () => {
             type: 'setData',
             name: 'setData',
             expressions: {
-                'parsedDateWithBias': 'parseSmartDate("next week at two", "2025-08-01", "America/New_York", true)',
-                'parsedDateWithoutBias': 'parseSmartDate("next week at two", "2025-08-01", "America/New_York", false)'
+                'parsedDateWithBias': 'parseSmartDate("next week at two", "2025-08-01", true)',
+                'parsedDateWithoutBias': 'parseSmartDate("next week at two", "2025-08-01", false)'
             }
         }
         const stepOutput = await stepRunner.runStep('1', step, {type: 'noMediaOutput'}, {});

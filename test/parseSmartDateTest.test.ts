@@ -1,7 +1,7 @@
 import {DateTime} from 'luxon';
 import {parseSmartDate} from '../src/inference/parseSmartDate';
 
-const anchorDate = DateTime.fromISO('2025-08-01').setZone('America/New_York');
+const anchorDate = DateTime.fromISO('2025-08-01');
 
 describe('parseSmartDate', () => {
     it('should parse next week', () => {
