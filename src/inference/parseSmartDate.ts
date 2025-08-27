@@ -75,7 +75,7 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
         });
         if (parsed.length > 0) {
             const start = parsed[0].start.date();
-            const startDateTime = DateTime.fromJSDate(start);
+            const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
             const startDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(startDateTime) : startDateTime;
             if (startDateTimeWithBias.toISOTime()) {
                 return {
@@ -92,7 +92,7 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
         });
         if (parsed.length > 0) {
             const end = parsed[0].start.date();
-            const endDateTime = DateTime.fromJSDate(end);
+            const endDateTime = DateTime.fromJSDate(end, {zone: anchorDate.zone});
             const endDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(endDateTime) : endDateTime;
             if (endDateTimeWithBias.toISOTime()) {
                 return {
@@ -113,10 +113,10 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
         });
         if (parsedStart.length > 0 && parsedEnd.length > 0) {
             const start = parsedStart[0].start.date();
-            const startDateTime = DateTime.fromJSDate(start);
+            const startDateTime = DateTime.fromJSDate(start, {zone: anchorDate.zone});
             const startDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(startDateTime) : startDateTime;
             const end = parsedEnd[0].start.date();
-            const endDateTime = DateTime.fromJSDate(end);
+            const endDateTime = DateTime.fromJSDate(end, {zone: anchorDate.zone});
             const endDateTimeWithBias = businessHourBias ? resolveBusinessHourBias(endDateTime) : endDateTime;
             if (startDateTimeWithBias.toISOTime() && endDateTimeWithBias.toISOTime()) {
                 return {
