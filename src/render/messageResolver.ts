@@ -1,5 +1,5 @@
 import {Context, Message} from "../core/model";
-import Jexl from 'jexl';
+import {jexlInstance} from "../data/jexlInstance";
 
 export class MessageResolver {
     public async resolveMessageText(message: Message, context: Context): Promise<string> {
@@ -8,7 +8,7 @@ export class MessageResolver {
                 case 'tts':
                     return Promise.resolve(element.text);
                 case 'dynamic':
-                    return Jexl.eval(element.name, context);
+                    return jexlInstance.eval(element.name, context);
                 default:
                     return Promise.reject('Unsupported element type');
             }

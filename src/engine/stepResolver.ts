@@ -1,5 +1,5 @@
 import {Context, FlowConfig, FlowStep, FlowStepOutput} from "../core/model";
-import Jexl from "jexl";
+import {jexlInstance} from "../data/jexlInstance";
 
 export class StepResolver {
 
@@ -24,7 +24,7 @@ export class StepResolver {
         const matchingCondition = flowStep.outs ? Object.entries(flowStep.outs)
             .find(([_, condition]) => {
                 try {
-                    return Boolean(Jexl.evalSync(condition, context));
+                    return Boolean(jexlInstance.evalSync(condition, context));
                 } catch (err) {
                     console.error(`Error evaluating condition for flow step ${flowStep.name}: ${condition}`);
                     throw err;
@@ -43,7 +43,7 @@ export class StepResolver {
     public static async doRepeatStep(flowStep: FlowStep, flowStepOutput: FlowStepOutput, context: Context) {
         if (flowStep.type === 'gatherIntent' && flowStepOutput.type === 'gatherIntent' && flowStep.repeat) {
             try {
-                const evaluation = await Jexl.eval(flowStep.repeat.condition, context);
+                const evaluation = await jexlInstance.eval(flowStep.repeat.condition, context);
                 const meetsCondition = Boolean(evaluation);
                 const maxAttempts = flowStepOutput.attempts >= flowStep.repeat.attempts;
                 return meetsCondition && !maxAttempts;

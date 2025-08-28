@@ -7,7 +7,7 @@ import {
     PlayMessageStep
 } from "../core/model";
 import {MessageResolver} from "../render/messageResolver";
-import Jexl from "jexl";
+import {jexlInstance} from "../data/jexlInstance";
 
 /**
  * Interface representing a handler for a step within a flow.
@@ -71,8 +71,8 @@ export class MakeCallStepHandler implements FlowStepHandler {
     }
 
     public async handle(flowStep: MakeCallStep, context: Context): Promise<FlowInstruction> {
-        const resolvedTo = await Jexl.eval(flowStep.to, context);
-        const resolvedFrom = await Jexl.eval(flowStep.from, context);
+        const resolvedTo = await jexlInstance.eval(flowStep.to, context);
+        const resolvedFrom = await jexlInstance.eval(flowStep.from, context);
         return {
             type: 'initiateCall',
             to: resolvedTo,

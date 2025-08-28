@@ -11,11 +11,9 @@ import {OpenAILLM} from "../inference/openAILLM";
 import {InferenceRunner} from "../inference/inferenceRunner";
 import {OpenAIInferenceRunner} from "../inference/openAIInferenceRunner";
 import {OpenAIInferenceParser} from "../inference/openAIInferenceParser";
-import Jexl from "jexl";
-import {DateTime} from "luxon";
-import {parseSmartDate} from "../inference/parseSmartDate";
 import axios, {AxiosRequestConfig} from 'axios';
 import {SecretsManager, SimpleSecretsManager} from "../secrets/secretsManager";
+import {jexlInstance} from "../data/jexlInstance";
 
 
 export class StepRunner {
@@ -144,31 +142,12 @@ Respond with JSON only. Do not include any other text or markdown.
     }
 
     private async processSetDataStep(step: SetDataStep, context: Context): Promise<SetDataOutput> {
-        Jexl.addFunction('parseSmartDate', (input: string, anchorDateString: string, businessHourBias?: boolean) => {
-            const anchorDate = DateTime.fromISO(anchorDateString);
-            return parseSmartDate(input, anchorDate, businessHourBias);
-        });
-
-        Jexl.addFunction('getSpokenDate', (isoDate: string, includeDayOfWeek?: boolean, locale?: string) => {
-            const date = DateTime.fromISO(isoDate);
-            if (includeDayOfWeek) {
-                return date.toLocaleString(DateTime.DATE_FULL, {locale: locale ?? 'en-US'});
-            } else {
-                return date.toLocaleString(DateTime.DATE_HUGE, {locale: locale ?? 'en-US'});
-            }
-        });
-
-        Jexl.addFunction('getSpokenTime', (isoTime: string, locale?: string) => {
-            const time = DateTime.fromISO(isoTime);
-            return time.toLocaleString(DateTime.TIME_SIMPLE, {locale: locale ?? 'en-US'});
-        })
-
         const evaluatedExpressions = Object.entries(step.expressions).map(async ([key, expression]) => {
             const contextWithUndefined = {
                 ...context,
                 'undefined': undefined
             }
-            const result = await Jexl.eval(expression, contextWithUndefined);
+            const result = await jexlInstance.eval(expression, contextWithUndefined);
             const tuple: [string, any] = [key, result];
             return tuple;
         });
@@ -189,7 +168,7 @@ Respond with JSON only. Do not include any other text or markdown.
 
     private async processRestCallStep(tenantId: string, step: RestCallStep, context: Context): Promise<RestCallOutput> {
         const axiosInstance = axios.create({});
-        const restCallUrl = await Jexl.eval(step.url, context);
+        const restCallUrl = await jexlInstance.eval(step.url, context);
         const resolvedBody =  step.body ? this.resolveRestCallBody(step.body, context) : undefined;
         const stepHeaders = await this.resolveRestCallHeaders(tenantId, step.headers);
         const restCallHeaders = {
@@ -240,7 +219,7 @@ Respond with JSON only. Do not include any other text or markdown.
                 const tuple: [string, any] = [key, value.value];
                 return tuple;
             } else if (value.type === 'dynamic') {
-                const tuple: [string, any] = [key, Jexl.evalSync(value.name, context)];
+                const tuple: [string, any] = [key, jexlInstance.evalSync(value.name, context)];
                 return tuple;
             } else {
                 const tuple: [string, any] = [key, this.resolveRestCallBody(value, context)];
