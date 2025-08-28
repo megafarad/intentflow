@@ -151,6 +151,16 @@ Respond with JSON only. Do not include any other text or markdown.
 
         Jexl.addFunction('isUndefined', (input: any) => {
             return input === undefined;
+        });
+
+        Jexl.addFunction('getSpokenDate', (isoDate: string) => {
+            const date = DateTime.fromISO(isoDate);
+            return date.toLocaleString(DateTime.DATE_HUGE);
+        });
+
+        Jexl.addFunction('getSpokenTime', (isoTime: string) => {
+            const time = DateTime.fromISO(isoTime);
+            return time.toLocaleString(DateTime.TIME_SIMPLE);
         })
 
         const evaluatedExpressions = Object.entries(step.expressions).map(async ([key, expression]) => {

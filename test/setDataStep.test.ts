@@ -50,5 +50,47 @@ describe('SetDataStep', () => {
         } else {
             throw new Error('Unexpected step output');
         }
-    })
+    });
+
+    it('should process getSpokenDate call', async () => {
+        const stepRunner = StepRunner.createDemoStepRunner();
+        const step: SetDataStep = {
+            type: 'setData',
+            name: 'setData',
+            expressions: {
+                'spokenDate': 'getSpokenDate(inputRecord.appointmentDate)'
+            }
+        }
+        const stepOutput = await stepRunner.runStep('1', step, {type: 'noMediaOutput'}, {
+            inputRecord: {
+                appointmentDate: '2025-08-08'
+            }
+        });
+        if (stepOutput.type === 'setDataSuccess') {
+            expect(stepOutput.data.spokenDate).toBe('Friday, August 8, 2025');
+        } else {
+            throw new Error('Unexpected step output');
+        }
+    });
+
+    it('should process getSpokenTime call', async () => {
+        const stepRunner = StepRunner.createDemoStepRunner();
+        const step: SetDataStep = {
+            type: 'setData',
+            name: 'setData',
+            expressions: {
+                'spokenTime': 'getSpokenTime(inputRecord.appointmentTime)'
+            }
+        }
+        const stepOutput = await stepRunner.runStep('1', step, {type: 'noMediaOutput'}, {
+            inputRecord: {
+                appointmentTime: '10:00'
+            }
+        });
+        if (stepOutput.type === 'setDataSuccess') {
+            expect(stepOutput.data.spokenTime).toBe('10:00 AM');
+        } else {
+            throw new Error('Unexpected step output');
+        }
+    });
 });
