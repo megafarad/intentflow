@@ -58,7 +58,7 @@ describe('SetDataStep', () => {
             type: 'setData',
             name: 'setData',
             expressions: {
-                'spokenDate': 'getSpokenDate(inputRecord.appointmentDate)'
+                'spokenDate': 'getSpokenDate(inputRecord.appointmentDate, true)'
             }
         }
         const stepOutput = await stepRunner.runStep('1', step, {type: 'noMediaOutput'}, {
