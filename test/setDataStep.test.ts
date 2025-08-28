@@ -29,13 +29,13 @@ describe('SetDataStep', () => {
         }
     });
 
-    it('should process isUndefined call', async () => {
+    it('should process undefined variable', async () => {
         const stepRunner = StepRunner.createDemoStepRunner();
         const step: SetDataStep = {
             type: 'setData',
             name: 'setData',
             expressions: {
-                'isUndefined': 'isUndefined(inputRecord.appointmentDate)',
+                'isUndefined': 'inputRecord.appointmentDate == undefined ? "true" : "false"',
                 'returnUndefined': 'undefined'
             }
         }
@@ -45,7 +45,7 @@ describe('SetDataStep', () => {
             }
         });
         if (stepOutput.type === 'setDataSuccess') {
-            expect(stepOutput.data.isUndefined).toBe(true);
+            expect(stepOutput.data.isUndefined).toBe("true");
             expect(stepOutput.data.returnUndefined).toBe(undefined);
         } else {
             throw new Error('Unexpected step output');
