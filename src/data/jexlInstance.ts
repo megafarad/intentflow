@@ -11,9 +11,9 @@ function buildJexlInstance() {
     Jexl.addFunction('getSpokenDate', (isoDate: string, includeDayOfWeek?: boolean, locale?: string) => {
         const date = DateTime.fromISO(isoDate);
         if (includeDayOfWeek) {
-            return date.toLocaleString(DateTime.DATE_FULL, {locale: locale ?? 'en-US'});
-        } else {
             return date.toLocaleString(DateTime.DATE_HUGE, {locale: locale ?? 'en-US'});
+        } else {
+            return date.toLocaleString(DateTime.DATE_FULL, {locale: locale ?? 'en-US'});
         }
     });
 
