@@ -27,5 +27,28 @@ describe('SetDataStep', () => {
         } else {
             throw new Error('Unexpected step output');
         }
+    });
+
+    it('should process isUndefined call', async () => {
+        const stepRunner = StepRunner.createDemoStepRunner();
+        const step: SetDataStep = {
+            type: 'setData',
+            name: 'setData',
+            expressions: {
+                'isUndefined': 'isUndefined(inputRecord.appointmentDate)',
+                'returnUndefined': 'undefined'
+            }
+        }
+        const stepOutput = await stepRunner.runStep('1', step, {type: 'noMediaOutput'}, {
+            inputRecord: {
+                appointmentDate: undefined
+            }
+        });
+        if (stepOutput.type === 'setDataSuccess') {
+            expect(stepOutput.data.isUndefined).toBe(true);
+            expect(stepOutput.data.returnUndefined).toBe(undefined);
+        } else {
+            throw new Error('Unexpected step output');
+        }
     })
 });

@@ -149,8 +149,16 @@ Respond with JSON only. Do not include any other text or markdown.
             return parseSmartDate(input, anchorDate, businessHourBias);
         });
 
+        Jexl.addFunction('isUndefined', (input: any) => {
+            return input === undefined;
+        })
+
         const evaluatedExpressions = Object.entries(step.expressions).map(async ([key, expression]) => {
-            const result = await Jexl.eval(expression, context);
+            const contextWithUndefined = {
+                ...context,
+                'undefined': undefined
+            }
+            const result = await Jexl.eval(expression, contextWithUndefined);
             const tuple: [string, any] = [key, result];
             return tuple;
         });
