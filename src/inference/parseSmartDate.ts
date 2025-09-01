@@ -37,6 +37,21 @@ function nextSunday(from: DateTime): DateTime {
 function toISOString(date: DateTime): string | undefined {
     return date.toISODate()?.slice(0, 10);
 }
+function parseStartTime(input: string, earliestTime: string, anchorDate: DateTime): string {
+    if (input.includes(('later'))) {
+        return anchorDate.plus({minute: 1}).toFormat('HH:mm');
+    } else {
+        return earliestTime;
+    }
+}
+
+function parseEndTime(input: string, latestTime: string, anchorDate: DateTime): string {
+    if (input.includes(('earlier'))) {
+        return anchorDate.minus({minute: 1}).toFormat('HH:mm');
+    } else {
+        return latestTime;
+    }
+}
 
 function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: boolean): ParsedTime | undefined {
     const replacedSpokenNumbers = input.replace('one', '1')
@@ -54,18 +69,18 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
 
     if (replacedSpokenNumbers.includes('morning') && !replacedSpokenNumbers.match(/[0-9]/)) {
         return {
-            fromTime: '00:00',
-            toTime: '12:00'
+            fromTime: parseStartTime(replacedSpokenNumbers, '00:00', anchorDate),
+            toTime: parseEndTime(replacedSpokenNumbers, '11:59', anchorDate)
         }
     } else if (replacedSpokenNumbers.includes('afternoon') && !replacedSpokenNumbers.match(/[0-9]/)) {
         return {
-            fromTime: '12:00',
-            toTime: '18:00'
+            fromTime: parseStartTime(replacedSpokenNumbers, '12:00', anchorDate),
+            toTime: parseEndTime(replacedSpokenNumbers, '17:59', anchorDate)
         }
     } else if (replacedSpokenNumbers.includes('evening') && !replacedSpokenNumbers.match(/[0-9]/)) {
         return {
-            fromTime: '18:00',
-            toTime: '00:00'
+            fromTime: parseStartTime(replacedSpokenNumbers, '18:00', anchorDate),
+            toTime: parseEndTime(replacedSpokenNumbers, '23:59', anchorDate)
         }
     } else if (replacedSpokenNumbers.includes('after') && !replacedSpokenNumbers.includes('afternoon')) {
         const timePart = replacedSpokenNumbers.split('after')[1];
@@ -120,6 +135,11 @@ function parseSmartTime(input: string, anchorDate: DateTime, businessHourBias?: 
                     toTime: endDateTimeWithBias.toFormat('HH:mm')
                 }
             }
+        }
+    } else if ((replacedSpokenNumbers.includes('earlier') || replacedSpokenNumbers.includes('later'))) {
+        return {
+            fromTime: parseStartTime(replacedSpokenNumbers, '00:00', anchorDate),
+            toTime: parseEndTime(replacedSpokenNumbers, '23:59', anchorDate)
         }
     } else {
         const parsed = chrono.parse(replacedSpokenNumbers, {
@@ -220,6 +240,16 @@ export function parseSmartDate(input: string, anchorDate: DateTime, businessHour
                 date: toISOString(start),
                 time: timeRange
             }
+        } else if (timeRange) {
+            return {
+                date: toISOString(anchorDate),
+                time: timeRange
+            }
+        }
+    } else if (timeRange) {
+        return {
+            date: toISOString(anchorDate),
+            time: timeRange
         }
     }
 
