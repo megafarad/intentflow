@@ -6,7 +6,7 @@ export interface DynamicElement {
     type: 'dynamic';
     sayAs: SayAs;
     format?: string;
-    name: string;
+    expression: string;
 }
 
 export interface TTSElement {
@@ -124,7 +124,7 @@ export interface StaticRestBodyValue {
 
 export interface DynamicRestBodyValue {
     type: 'dynamic';
-    name: string;
+    expression: string;
 }
 
 export type RestBodyValue = StaticRestBodyValue | DynamicRestBodyValue;

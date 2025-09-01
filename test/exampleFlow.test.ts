@@ -37,11 +37,11 @@ const exampleFlowConfig: FlowConfig = {
             agentPrompt: {
                 elements: [
                     {type: 'tts', text: 'This is '},
-                    {type: 'dynamic', sayAs: 'text', name: 'inputRecord.clinicName'},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
                     {type: 'tts',  text: ' calling with an important message. Is this '},
-                    {type: 'dynamic', sayAs: 'text',  name: 'inputRecord.firstName'},
+                    {type: 'dynamic', sayAs: 'text',  expression: 'inputRecord.firstName'},
                     {type: 'tts', text: ' '},
-                    {type: 'dynamic', sayAs: 'text', name: 'inputRecord.lastName'},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.lastName'},
                     {type: 'tts', text: '?'}
                 ]
             },
@@ -68,7 +68,7 @@ const exampleFlowConfig: FlowConfig = {
             preamble: 'You are an intent parser, parsing the intent during the authentication stage of a phone call.',
             agentPrompt: {
                 elements: [
-                    {type: 'dynamic', sayAs: 'text', name: 'inputRecord.clinicName'},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
                     {type: 'tts', text: ' cares about your privacy. To verify your identity, please say your date of ' +
                             'birth.'}
                 ]
@@ -103,13 +103,13 @@ const exampleFlowConfig: FlowConfig = {
                 "call.",
             agentPrompt: {
                 elements: [
-                    {type: 'dynamic', sayAs: 'text', name: 'inputRecord.clinicName'},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
                     {type: 'tts', text: ' is calling to remind you of an appointment with '},
-                    {type: 'dynamic', sayAs: 'text', name: 'inputRecord.practitioner'},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.practitioner'},
                     {type: 'tts', text: ' on '},
-                    {type: 'dynamic', sayAs: 'text', name: 'inputRecord.appointmentDate'},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.appointmentDate'},
                     {type: 'tts', text: ' at '},
-                    {type: 'dynamic', sayAs: 'text', name: 'inputRecord.appointmentTime'},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.appointmentTime'},
                     {type: 'tts', text: '. Will you be able to make your appointment?'}
                 ]
             },

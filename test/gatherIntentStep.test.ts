@@ -8,13 +8,13 @@ const gatherIntentStep: GatherIntentStep = {
         "call.",
     agentPrompt: {
         elements: [
-            {type: 'dynamic', sayAs: 'text', name: 'inputRecord.clinicName'},
+            {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
             {type: 'tts', text: ' is calling to remind you of an appointment with '},
-            {type: 'dynamic', sayAs: 'text', name: 'inputRecord.practitioner'},
+            {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.practitioner'},
             {type: 'tts', text: ' on '},
-            {type: 'dynamic', sayAs: 'text', name: 'inputRecord.appointmentDate'},
+            {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.appointmentDate'},
             {type: 'tts', text: ' at '},
-            {type: 'dynamic', sayAs: 'text', name: 'inputRecord.appointmentTime'},
+            {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.appointmentTime'},
             {type: 'tts', text: '. Will you be able to make your appointment?'}
         ]
     },

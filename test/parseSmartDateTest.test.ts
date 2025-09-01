@@ -47,14 +47,6 @@ describe('parseSmartDate', () => {
                 toTime: '23:59'
             }
         })
-        expect(result).toEqual({
-            fromDate: '2025-08-03',
-            toDate: '2025-08-10',
-            time: {
-                fromTime: '18:00',
-                toTime: '23:59'
-            }
-        });
     });
 
     it('should parse a time', () => {

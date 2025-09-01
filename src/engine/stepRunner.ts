@@ -219,7 +219,7 @@ Respond with JSON only. Do not include any other text or markdown.
                 const tuple: [string, any] = [key, value.value];
                 return tuple;
             } else if (value.type === 'dynamic') {
-                const tuple: [string, any] = [key, jexlInstance.evalSync(value.name, context)];
+                const tuple: [string, any] = [key, jexlInstance.evalSync(value.expression, context)];
                 return tuple;
             } else {
                 const tuple: [string, any] = [key, this.resolveRestCallBody(value, context)];

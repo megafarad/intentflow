@@ -8,7 +8,7 @@ export class MessageResolver {
                 case 'tts':
                     return Promise.resolve(element.text);
                 case 'dynamic':
-                    return jexlInstance.eval(element.name, context);
+                    return jexlInstance.eval(element.expression, context);
                 default:
                     return Promise.reject('Unsupported element type');
             }
