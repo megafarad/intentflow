@@ -1,7 +1,7 @@
 import {DateTime} from 'luxon';
 import {parseSmartDate} from '../src/inference/parseSmartDate';
 
-const anchorDate = DateTime.fromISO('2025-08-01T12:00:00.000').setZone('America/New_York');
+const anchorDate = DateTime.fromISO('2025-08-01T12:00:00.000');
 
 describe('parseSmartDate', () => {
     it('should parse next week', () => {
@@ -101,7 +101,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse later', () => {
-        const result = parseSmartDate('later', anchorDate.setZone('America/New_York'), true);
+        const result = parseSmartDate('later', anchorDate, true);
         expect(result).toEqual({
             date: '2025-08-01',
             time: {
@@ -112,7 +112,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse later with morning', () => {
-        const result = parseSmartDate('later in the morning', anchorDate.set({hour: 8, minute: 0}).setZone('America/New_York'), true);
+        const result = parseSmartDate('later in the morning', anchorDate.set({hour: 8, minute: 0}), true);
         expect(result).toEqual({
             //TODO: this is not correct, should be 2025-08-01, but for some reason chrono-node is returning 2025-08-02
             date: '2025-08-02',
@@ -124,7 +124,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse later with evening', () => {
-        const result = parseSmartDate('later in the evening', anchorDate.set({hour: 18, minute: 0}).setZone('America/New_York'), true);
+        const result = parseSmartDate('later in the evening', anchorDate.set({hour: 18, minute: 0}), true);
         expect(result).toEqual({
             date: '2025-08-01',
             time: {
@@ -135,7 +135,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse later with afternoon', () => {
-        const result = parseSmartDate('later in the afternoon', anchorDate.set({hour: 14, minute: 0}).setZone('America/New_York'), true);
+        const result = parseSmartDate('later in the afternoon', anchorDate.set({hour: 14, minute: 0}), true);
         expect(result).toEqual({
             date: '2025-08-01',
             time: {
@@ -146,7 +146,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse earlier', () => {
-        const result = parseSmartDate('earlier', anchorDate.set({hour: 8, minute: 0}).setZone('America/New_York'), true);
+        const result = parseSmartDate('earlier', anchorDate.set({hour: 8, minute: 0}), true);
         expect(result).toEqual({
             date: '2025-08-01',
             time: {
@@ -157,7 +157,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse earlier with morning', () => {
-        const result = parseSmartDate('earlier in the morning', anchorDate.set({hour: 8, minute: 0}).setZone('America/New_York'), true);
+        const result = parseSmartDate('earlier in the morning', anchorDate.set({hour: 8, minute: 0}), true);
         expect(result).toEqual({
             //TODO: this is not correct, should be 2025-08-01, but for some reason chrono-node is returning 2025-08-02
             date: '2025-08-02',
@@ -169,7 +169,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse earlier with evening', () => {
-        const result = parseSmartDate('earlier in the evening', anchorDate.set({hour: 20, minute: 0}).setZone('America/New_York'), true);
+        const result = parseSmartDate('earlier in the evening', anchorDate.set({hour: 20, minute: 0}), true);
         expect(result).toEqual({
             date: '2025-08-01',
             time: {
@@ -180,7 +180,7 @@ describe('parseSmartDate', () => {
     });
 
     it('should parse earlier with afternoon', () => {
-        const result = parseSmartDate('earlier in the afternoon', anchorDate.set({hour: 14, minute: 0}).setZone('America/New_York'), true);
+        const result = parseSmartDate('earlier in the afternoon', anchorDate.set({hour: 14, minute: 0}), true);
         expect(result).toEqual({
             date: '2025-08-01',
             time: {
