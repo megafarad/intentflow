@@ -20,13 +20,12 @@ import {
 
 export class FlowEngine {
 
-    constructor(private messageResolver: MessageResolver, private stepRunner: StepRunner,
-                private logger: FlowLogger) {
+    constructor(private messageResolver: MessageResolver, private stepRunner: StepRunner) {
 
     }
 
-    public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, stepName?: string,
-                          mediaOutput?: MediaOutput, logSubscriberId?: string): Promise<FlowExecutionOutput> {
+    public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, logger?: FlowLogger,
+                          logSubscriberId?: string, stepName?: string, mediaOutput?: MediaOutput): Promise<FlowExecutionOutput> {
 
 
         //Get step
@@ -42,7 +41,7 @@ export class FlowEngine {
         } : context;
 
         if (flowStepOutput) {
-            await this.logger.log({
+            await logger?.log({
                 id: uuidv7(),
                 logSubscriberId: logSubscriberId,
                 flowStep: step,
@@ -66,7 +65,7 @@ export class FlowEngine {
         //Get step instruction
         const nextFlowInstruction = await this.getFlowInstruction(updatedContext, doRepeat, nextStep);
 
-        await this.logger.log({
+        await logger?.log({
             id: uuidv7(),
             logSubscriberId: logSubscriberId,
             flowStep: nextStep,
@@ -82,7 +81,8 @@ export class FlowEngine {
             const mediaOutput: NoMediaOutput = {
                 type: 'noMediaOutput'
             }
-            return this.execStep(tenantId, flowConfig, updatedContext, executionStep.name, mediaOutput);
+            return this.execStep(tenantId, flowConfig, updatedContext, logger, logSubscriberId, executionStep.name,
+                mediaOutput);
         } else {
             return {
                 nextInstruction: nextFlowInstruction,
@@ -134,8 +134,7 @@ export class FlowEngine {
 
     }
 
-    public static create(logger: FlowLogger): FlowEngine {
-        return new FlowEngine(new MessageResolver(), StepRunner.createDemoStepRunner(),
-            logger);
+    public static create(): FlowEngine {
+        return new FlowEngine(new MessageResolver(), StepRunner.createDemoStepRunner());
     }
 }

@@ -8,6 +8,8 @@ import {
 } from "../src";
 import {ConsoleFlowLogger} from "../src";
 
+const logger = new ConsoleFlowLogger();
+
 const exampleFlowConfig: FlowConfig = {
     id: 'exampleFlowTest',
     name: 'HealthcareAppointmentReminderCall',
@@ -182,8 +184,7 @@ const exampleFlowConfig: FlowConfig = {
 
 describe('FlowEngine', () => {
     it('should properly run a flow', async () => {
-        const logger = new ConsoleFlowLogger();
-        const flowEngine = FlowEngine.create(logger);
+        const flowEngine = FlowEngine.create();
         const tenantId = '1';
 
         const inputRecord: Record<string, any> = {
@@ -215,7 +216,7 @@ describe('FlowEngine', () => {
         }
 
         const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            firstFlowExecutionOutput.updatedContext, firstFlowExecutionOutput.nextStepName, firstStepOutput);
+            firstFlowExecutionOutput.updatedContext, logger, "subscriber", firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
         expect(secondFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
 
@@ -226,7 +227,7 @@ describe('FlowEngine', () => {
         }
 
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            secondFlowExecutionOutput.updatedContext, secondFlowExecutionOutput.nextStepName, secondStepOutput);
+            secondFlowExecutionOutput.updatedContext, logger, "subscriber", secondFlowExecutionOutput.nextStepName, secondStepOutput);
 
         expect(thirdFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
 
@@ -237,7 +238,7 @@ describe('FlowEngine', () => {
         }
 
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            thirdFlowExecutionOutput.updatedContext, thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
+            thirdFlowExecutionOutput.updatedContext, logger, "subscriber", thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
 
         expect(fourthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
 
@@ -248,14 +249,13 @@ describe('FlowEngine', () => {
         }
 
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
+            fourthFlowExecutionOutput.updatedContext, logger, "subscriber", fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
 
         expect(fifthFlowExecutionOutput.nextInstruction.type).toBe('endCall');
     }, 10000);
 
     it('should properly run a flow with a repeat', async () => {
-        const logger = new ConsoleFlowLogger();
-        const flowEngine = FlowEngine.create(logger);
+        const flowEngine = FlowEngine.create();
         const tenantId = '1';
         const inputRecord: Record<string, any> = {
             clinicName: 'Sunshine Medical',
@@ -285,7 +285,7 @@ describe('FlowEngine', () => {
         }
 
         const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            firstFlowExecutionOutput.updatedContext, firstFlowExecutionOutput.nextStepName, firstStepOutput);
+            firstFlowExecutionOutput.updatedContext, logger, "subscriber", firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
         expect(secondFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
 
@@ -296,7 +296,7 @@ describe('FlowEngine', () => {
         }
 
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            secondFlowExecutionOutput.updatedContext, secondFlowExecutionOutput.nextStepName, secondStepOutput);
+            secondFlowExecutionOutput.updatedContext, logger, "subscriber", secondFlowExecutionOutput.nextStepName, secondStepOutput);
 
         expect(thirdFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
 
@@ -306,7 +306,7 @@ describe('FlowEngine', () => {
             isReprompt: false
         }
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            thirdFlowExecutionOutput.updatedContext, thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
+            thirdFlowExecutionOutput.updatedContext, logger, "subscriber", thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
 
         expect(fourthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
 
@@ -316,7 +316,7 @@ describe('FlowEngine', () => {
             isReprompt: false
         }
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
+            fourthFlowExecutionOutput.updatedContext, logger, "subscriber", fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
 
         expect(fifthFlowExecutionOutput.nextInstruction.type).toBe('repeat');
         expect(fifthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
@@ -326,7 +326,7 @@ describe('FlowEngine', () => {
         }
 
         const sixthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            fifthFlowExecutionOutput.updatedContext, fifthFlowExecutionOutput.nextStepName, fifthStepOutput);
+            fifthFlowExecutionOutput.updatedContext, logger, "subscriber", fifthFlowExecutionOutput.nextStepName, fifthStepOutput);
 
         expect(sixthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
         expect(sixthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
@@ -338,7 +338,7 @@ describe('FlowEngine', () => {
         }
 
         const seventhFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            sixthFlowExecutionOutput.updatedContext, sixthFlowExecutionOutput.nextStepName, sixthStepOutput);
+            sixthFlowExecutionOutput.updatedContext, logger, "subscriber", sixthFlowExecutionOutput.nextStepName, sixthStepOutput);
 
         expect(seventhFlowExecutionOutput.nextInstruction.type).toBe('endCall');
 
