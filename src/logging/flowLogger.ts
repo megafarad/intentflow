@@ -2,6 +2,7 @@ import {FlowStep} from "../core/model";
 
 export interface LogEntry {
     id: string;
+    logSubscriberId?: string;
     flowStep?: FlowStep;
     level?: 'info' | 'warn' | 'error';
     message?: string;
@@ -12,5 +13,4 @@ export interface LogEntry {
 
 export interface FlowLogger {
     log(entry: LogEntry): Promise<void>;
-    flush?(): Promise<void>;
 }

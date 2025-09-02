@@ -4,7 +4,7 @@ import {
     FlowStep,
     MediaOutput, FlowExecutionOutput, FlowConfig, NoMediaOutput
 } from '../core/model';
-import {v1 as uuidv1} from 'uuid';
+import {v7 as uuidv7} from 'uuid';
 import {MessageResolver} from "../render/messageResolver";
 import {StepRunner} from "./stepRunner";
 import {FlowLogger} from "../logging/flowLogger";
@@ -26,7 +26,7 @@ export class FlowEngine {
     }
 
     public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, stepName?: string,
-                          mediaOutput?: MediaOutput): Promise<FlowExecutionOutput> {
+                          mediaOutput?: MediaOutput, logSubscriberId?: string): Promise<FlowExecutionOutput> {
 
 
         //Get step
@@ -43,7 +43,8 @@ export class FlowEngine {
 
         if (flowStepOutput) {
             await this.logger.log({
-                id: uuidv1(),
+                id: uuidv7(),
+                logSubscriberId: logSubscriberId,
                 flowStep: step,
                 level: 'info',
                 event: 'step_output',
@@ -66,7 +67,8 @@ export class FlowEngine {
         const nextFlowInstruction = await this.getFlowInstruction(updatedContext, doRepeat, nextStep);
 
         await this.logger.log({
-            id: uuidv1(),
+            id: uuidv7(),
+            logSubscriberId: logSubscriberId,
             flowStep: nextStep,
             level: 'info',
             event: 'next_step',
