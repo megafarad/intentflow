@@ -73,11 +73,13 @@ export class MakeCallStepHandler implements FlowStepHandler {
     public async handle(flowStep: MakeCallStep, context: Context): Promise<FlowInstruction> {
         const resolvedTo = await jexlInstance.eval(flowStep.to, context);
         const resolvedFrom = await jexlInstance.eval(flowStep.from, context);
+        const leaveAM = await jexlInstance.eval(flowStep.leaveAMCondition, context);
         return {
             type: 'initiateCall',
             to: resolvedTo,
             from: resolvedFrom,
-            timeout: flowStep.timeout
+            timeout: flowStep.timeout,
+            amHandling: leaveAM ? 'leave_message' : 'hangup'
         }
     }
 }

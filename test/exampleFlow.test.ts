@@ -21,6 +21,7 @@ const exampleFlowConfig: FlowConfig = {
             to: '"+1" + inputRecord.phoneNumber',
             from: '"+18445680751"',
             timeout: 30,
+            leaveAMCondition: 'true',
             outs: {
                 'liveAnswer': 'makeCall.result == "LA"',
                 'answeringMachine': 'makeCall.result == "AM"',
