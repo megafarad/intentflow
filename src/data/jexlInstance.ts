@@ -9,7 +9,7 @@ function buildJexlInstance() {
     });
 
     Jexl.addFunction('getSpokenDate', (isoDate: string, includeDayOfWeek?: boolean, locale?: string) => {
-        const date = DateTime.fromISO(isoDate);
+        const date = DateTime.fromISO(isoDate, {setZone: true});
         if (includeDayOfWeek) {
             return date.toLocaleString(DateTime.DATE_HUGE, {locale: locale ?? 'en-US'});
         } else {
@@ -18,7 +18,7 @@ function buildJexlInstance() {
     });
 
     Jexl.addFunction('getSpokenTime', (isoTime: string, locale?: string) => {
-        const time = DateTime.fromISO(isoTime);
+        const time = DateTime.fromISO(isoTime, {setZone: true});
         return time.toLocaleString(DateTime.TIME_SIMPLE, {locale: locale ?? 'en-US'});
     })
 

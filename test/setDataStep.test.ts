@@ -93,4 +93,25 @@ describe('SetDataStep', () => {
             throw new Error('Unexpected step output');
         }
     });
+
+    it('should speak the time in the local time zone', async () => {
+        const stepRunner = StepRunner.createDemoStepRunner();
+        const step: SetDataStep = {
+            type: 'setData',
+            name: 'setData',
+            expressions: {
+                'spokenTime': 'getSpokenTime(inputRecord.startTime)'
+            }
+        }
+        const stepOutput = await stepRunner.runStep('1', step, {type: 'noMediaOutput'}, {
+            inputRecord: {
+                startTime: "2025-09-15T16:00:00.000-04:00"
+            }
+        });
+        if (stepOutput.type === 'setDataSuccess') {
+            expect(stepOutput.data.spokenTime).toBe('4:00 PM');
+        } else {
+            throw new Error('Unexpected step output');
+        }
+    })
 });
