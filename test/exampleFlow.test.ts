@@ -22,6 +22,13 @@ const exampleFlowConfig: FlowConfig = {
             from: '"+18445680751"',
             timeout: 30,
             leaveAMCondition: 'true',
+            callAnnouncement: {
+                elements: [
+                    {type: 'tts', text: 'This is '},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
+                    {type: 'tts',  text: ' calling with an important message.'},
+                ]
+            },
             outs: {
                 'liveAnswer': 'makeCall.result == "LA"',
                 'answeringMachine': 'makeCall.result == "AM"',
@@ -39,9 +46,7 @@ const exampleFlowConfig: FlowConfig = {
                 'a telephone call.',
             agentPrompt: {
                 elements: [
-                    {type: 'tts', text: 'This is '},
-                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
-                    {type: 'tts',  text: ' calling with an important message. Is this '},
+                    {type: 'tts',  text: 'Is this '},
                     {type: 'dynamic', sayAs: 'text',  expression: 'inputRecord.firstName'},
                     {type: 'tts', text: ' '},
                     {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.lastName'},

@@ -66,19 +66,21 @@ export class RepeatGatherIntentStepHandler implements FlowStepHandler {
 }
 
 export class MakeCallStepHandler implements FlowStepHandler {
-    constructor() {
+    constructor(private messageResolver: MessageResolver) {
 
     }
 
     public async handle(flowStep: MakeCallStep, context: Context): Promise<FlowInstruction> {
         const resolvedTo = await jexlInstance.eval(flowStep.to, context);
         const resolvedFrom = await jexlInstance.eval(flowStep.from, context);
+        const resolvedCallAnnouncement = await this.messageResolver.resolveMessageText(flowStep.callAnnouncement, context);
         const leaveAM = await jexlInstance.eval(flowStep.leaveAMCondition, context);
         return {
             type: 'initiateCall',
             to: resolvedTo,
             from: resolvedFrom,
             timeout: flowStep.timeout,
+            callAnnouncement: resolvedCallAnnouncement,
             amHandling: leaveAM ? 'leave_message' : 'hangup'
         }
     }

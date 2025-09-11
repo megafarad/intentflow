@@ -114,7 +114,7 @@ export class FlowEngine {
                     break;
                 }
             case 'makeCall':
-                handler = new MakeCallStepHandler();
+                handler = new MakeCallStepHandler(this.messageResolver);
                 break;
             case 'playMessage':
                 handler = new PlayMessageStepHandler(this.messageResolver);

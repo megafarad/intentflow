@@ -70,6 +70,7 @@ export interface MakeCallStep extends FlowStepBase {
     from: string;
     to: string;
     timeout: number;
+    callAnnouncement: Message;
     leaveAMCondition: string;
 }
 
@@ -177,6 +178,7 @@ export interface InitiateCallInstruction {
     to: string;
     from: string;
     timeout: number;
+    callAnnouncement: string;
     amHandling: 'hangup' | 'leave_message'
 }
 
