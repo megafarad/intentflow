@@ -48,7 +48,7 @@ export interface GatherIntentOutput {
 export interface CallPromptOutput {
     type: 'callPrompt';
     utterance: string;
-    isReprompt: boolean;
+    isReprompt?: boolean;
 }
 
 export interface GatherIntentStep extends FlowStepBase {
