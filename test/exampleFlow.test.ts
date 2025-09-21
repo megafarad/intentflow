@@ -210,7 +210,7 @@ describe('FlowEngine', () => {
 
         const firstFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig, initialContext);
 
-        if (firstFlowExecutionOutput.nextInstruction.type === 'initiateCall') {
+        if (firstFlowExecutionOutput.nextInstruction?.type === 'initiateCall') {
             expect(firstFlowExecutionOutput.nextInstruction.to).toBe('+12065551234');
         } else {
             throw new Error('Unexpected flow instruction');
@@ -224,7 +224,7 @@ describe('FlowEngine', () => {
         const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             firstFlowExecutionOutput.updatedContext, logger, "subscriber", firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
-        expect(secondFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(secondFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
         const secondStepOutput: CallPromptOutput = {
             type: 'callPrompt',
@@ -235,7 +235,7 @@ describe('FlowEngine', () => {
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             secondFlowExecutionOutput.updatedContext, logger, "subscriber", secondFlowExecutionOutput.nextStepName, secondStepOutput);
 
-        expect(thirdFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(thirdFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
         const thirdStepOutput: CallPromptOutput = {
             type: 'callPrompt',
@@ -246,7 +246,7 @@ describe('FlowEngine', () => {
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             thirdFlowExecutionOutput.updatedContext, logger, "subscriber", thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
 
-        expect(fourthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(fourthFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
         const fourthStepOutput: CallPromptOutput = {
             type: 'callPrompt',
@@ -257,7 +257,7 @@ describe('FlowEngine', () => {
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             fourthFlowExecutionOutput.updatedContext, logger, "subscriber", fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
 
-        expect(fifthFlowExecutionOutput.nextInstruction.type).toBe('endCall');
+        expect(fifthFlowExecutionOutput.nextInstruction).toBe(undefined);
     }, 10000);
 
     it('should properly run a flow with a repeat', async () => {
@@ -279,7 +279,7 @@ describe('FlowEngine', () => {
         const firstFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             initialContext);
 
-        if (firstFlowExecutionOutput.nextInstruction.type === 'initiateCall') {
+        if (firstFlowExecutionOutput.nextInstruction?.type === 'initiateCall') {
             expect(firstFlowExecutionOutput.nextInstruction.to).toBe('+12065551234');
         } else {
             throw new Error('Unexpected flow instruction');
@@ -293,7 +293,7 @@ describe('FlowEngine', () => {
         const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             firstFlowExecutionOutput.updatedContext, logger, "subscriber", firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
-        expect(secondFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(secondFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
         const secondStepOutput: CallPromptOutput = {
             type: 'callPrompt',
@@ -304,7 +304,7 @@ describe('FlowEngine', () => {
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             secondFlowExecutionOutput.updatedContext, logger, "subscriber", secondFlowExecutionOutput.nextStepName, secondStepOutput);
 
-        expect(thirdFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(thirdFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
         const thirdStepOutput: CallPromptOutput = {
             type: 'callPrompt',
@@ -314,7 +314,7 @@ describe('FlowEngine', () => {
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             thirdFlowExecutionOutput.updatedContext, logger, "subscriber", thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
 
-        expect(fourthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(fourthFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
         const fourthStepOutput: CallPromptOutput = {
             type: 'callPrompt',
@@ -324,7 +324,7 @@ describe('FlowEngine', () => {
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             fourthFlowExecutionOutput.updatedContext, logger, "subscriber", fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
 
-        expect(fifthFlowExecutionOutput.nextInstruction.type).toBe('repeat');
+        expect(fifthFlowExecutionOutput.nextInstruction?.type).toBe('repeat');
         expect(fifthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
 
         const fifthStepOutput: NoMediaOutput = {
@@ -334,7 +334,7 @@ describe('FlowEngine', () => {
         const sixthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             fifthFlowExecutionOutput.updatedContext, logger, "subscriber", fifthFlowExecutionOutput.nextStepName, fifthStepOutput);
 
-        expect(sixthFlowExecutionOutput.nextInstruction.type).toBe('callPrompt');
+        expect(sixthFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
         expect(sixthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
 
         const sixthStepOutput: CallPromptOutput = {
@@ -346,7 +346,7 @@ describe('FlowEngine', () => {
         const seventhFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             sixthFlowExecutionOutput.updatedContext, logger, "subscriber", sixthFlowExecutionOutput.nextStepName, sixthStepOutput);
 
-        expect(seventhFlowExecutionOutput.nextInstruction.type).toBe('endCall');
+        expect(seventhFlowExecutionOutput.nextInstruction).toBe(undefined);
 
     }, 20000);
 });

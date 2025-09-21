@@ -214,9 +214,9 @@ export type FlowInstruction =
     | EndCallInstruction;
 
 export interface FlowExecutionOutput {
-    nextInstruction: FlowInstruction;
-    nextStepName: string;
-    nextStepType: FlowStepType;
+    nextInstruction?: FlowInstruction;
+    nextStepName?: string;
+    nextStepType?: FlowStepType;
     updatedContext: Context;
 }
 

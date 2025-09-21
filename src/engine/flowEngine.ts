@@ -56,11 +56,8 @@ export class FlowEngine {
 
         const resolvedStep = doRepeat ? step : StepResolver.resolveStep(flowConfig, updatedContext, step,
             flowStepOutput);
-        const nextStep: FlowStep = resolvedStep ? resolvedStep : (!stepName) ? StepResolver
-            .findInitialStep(flowConfig) : {
-            name: stepName,
-            type: 'endCall'
-        }
+        const nextStep: FlowStep | undefined = resolvedStep ? resolvedStep : (!stepName) ? StepResolver
+            .findInitialStep(flowConfig) : undefined
 
         //Get step instruction
         const nextFlowInstruction = await this.getFlowInstruction(updatedContext, doRepeat, nextStep);
@@ -75,31 +72,30 @@ export class FlowEngine {
             timestamp: new Date().toISOString()
         });
 
-        const executionStep = nextStep ? nextStep : step;
+        const nextStepName = nextStep?.name;
+        const nextStepType = nextStep?.type;
 
-        if (['setData', 'restCall'].includes(nextFlowInstruction.type)) {
+        if (nextFlowInstruction?.type && ['setData', 'restCall'].includes(nextFlowInstruction?.type)) {
             const mediaOutput: NoMediaOutput = {
                 type: 'noMediaOutput'
             }
-            return this.execStep(tenantId, flowConfig, updatedContext, logger, logSubscriberId, executionStep.name,
+            return this.execStep(tenantId, flowConfig, updatedContext, logger, logSubscriberId, nextStepName,
                 mediaOutput);
         } else {
             return {
                 nextInstruction: nextFlowInstruction,
-                nextStepName: executionStep.name,
-                nextStepType: executionStep.type,
+                nextStepName: nextStepName,
+                nextStepType: nextStepType,
                 updatedContext: updatedContext
             };
         }
 
     }
 
-    private async getFlowInstruction(context: Context, isRepeat: boolean, flowStep?: FlowStep): Promise<FlowInstruction> {
+    private async getFlowInstruction(context: Context, isRepeat: boolean, flowStep?: FlowStep): Promise<FlowInstruction | undefined> {
 
         if (!flowStep) {
-            return {
-                type: 'endCall'
-            }
+            return undefined;
         }
 
         let handler: FlowStepHandler;
