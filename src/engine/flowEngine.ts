@@ -18,16 +18,23 @@ import {
     PlayMessageStepHandler, RepeatGatherIntentStepHandler, RestCallHandler, SetDataHandler
 } from "./flowStepHandler";
 import {defaultJexlInstance} from "../data/defaultJexlInstance";
+import {InferenceRunner} from "../inference/inferenceRunner";
+import {SecretsManager, SimpleSecretsManager} from "../secrets/secretsManager";
+import {OpenAIInferenceRunner} from "../inference/openAIInferenceRunner";
+import {OpenAILLM} from "../inference/openAILLM";
+import {OpenAIInferenceParser} from "../inference/openAIInferenceParser";
 
 export class FlowEngine {
 
     private stepResolver: StepResolver;
+    private stepRunner: StepRunner;
     private readonly messageResolver: MessageResolver;
 
-    constructor(private stepRunner: StepRunner, private evaluator: Jexl) {
+    constructor(private evaluator: Jexl, inferenceRunner: InferenceRunner, secretsManger: SecretsManager) {
 
         this.stepResolver = new StepResolver(this.evaluator);
         this.messageResolver = new MessageResolver(this.evaluator);
+        this.stepRunner = new StepRunner(this.messageResolver, inferenceRunner, secretsManger, this.evaluator);
     }
 
     public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, logger?: FlowLogger,
@@ -136,7 +143,12 @@ export class FlowEngine {
 
     }
 
-    public static create(): FlowEngine {
-        return new FlowEngine(StepRunner.createDemoStepRunner(), defaultJexlInstance);
+    public static create(evaluator: Jexl, inferenceRunner: InferenceRunner, secretsManager: SecretsManager): FlowEngine {
+        return new FlowEngine(evaluator, inferenceRunner, secretsManager);
+    }
+
+    public static createDemoEngine(): FlowEngine {
+        return new FlowEngine(defaultJexlInstance, OpenAIInferenceRunner
+            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager());
     }
 }

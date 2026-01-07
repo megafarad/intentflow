@@ -1,5 +1,7 @@
 import {StepRunner} from "../src/engine/stepRunner";
 import {CallPromptOutput, GatherIntentStep} from "../src";
+import {defaultJexlInstance} from "../src/data/defaultJexlInstance";
+import {MessageResolver} from "../src/render/messageResolver";
 
 const gatherIntentStep: GatherIntentStep = {
     name: "gatherMainIntent",
@@ -67,6 +69,11 @@ const gatherIntentStep: GatherIntentStep = {
 }
 
 describe('gatherIntentStep', () => {
+
+    const evaluator = defaultJexlInstance;
+    const messageResolver = new MessageResolver(evaluator);
+    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, evaluator);
+
     it('should gather the intent with an entity', async () => {
         const context = {
             inputRecord: {
@@ -82,8 +89,6 @@ describe('gatherIntentStep', () => {
             utterance: "I can't make it. Can we do it next Friday?",
             isReprompt: false
         }
-
-        const stepRunner = StepRunner.createDemoStepRunner();
 
         const stepOutput = await stepRunner.runStep('1', gatherIntentStep, callInstructionOutput,
             context);

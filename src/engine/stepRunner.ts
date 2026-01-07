@@ -1,3 +1,4 @@
+import {Jexl} from "@pawel-up/jexl";
 import {
     MediaOutput,
     CallPromptOutput,
@@ -13,8 +14,6 @@ import {OpenAIInferenceRunner} from "../inference/openAIInferenceRunner";
 import {OpenAIInferenceParser} from "../inference/openAIInferenceParser";
 import axios, {AxiosRequestConfig} from 'axios';
 import {SecretsManager, SimpleSecretsManager} from "../secrets/secretsManager";
-import {Jexl} from "@pawel-up/jexl";
-import {defaultJexlInstance} from "../data/defaultJexlInstance";
 
 
 export class StepRunner {
@@ -137,9 +136,9 @@ Respond with JSON only. Do not include any other text or markdown.
 `
     }
 
-    public static createDemoStepRunner() {
-        return new StepRunner(new MessageResolver(defaultJexlInstance), OpenAIInferenceRunner
-            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager(), defaultJexlInstance)
+    public static createDemoStepRunner(messageResolver: MessageResolver, evaluator: Jexl): StepRunner {
+        return new StepRunner(messageResolver, OpenAIInferenceRunner
+            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager(), evaluator);
     }
 
     private async processSetDataStep(step: SetDataStep, context: Context): Promise<SetDataOutput> {
@@ -148,8 +147,8 @@ Respond with JSON only. Do not include any other text or markdown.
                 ...context,
                 'undefined': undefined
             }
-            const result = await defaultJexlInstance.eval(expression, contextWithUndefined);
-            const tuple: [string, any] = [key, result];
+            const result = await this.evaluator.eval(expression, contextWithUndefined);
+            const tuple: [string, unknown] = [key, result];
             return tuple;
         });
         try {

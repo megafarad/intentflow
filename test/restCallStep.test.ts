@@ -1,5 +1,7 @@
 import {RestCallStep, Context, MediaOutput} from "../src";
 import {StepRunner} from "../src/engine/stepRunner";
+import {defaultJexlInstance} from "../src/data/defaultJexlInstance";
+import {MessageResolver} from "../src/render/messageResolver";
 
 const step: RestCallStep = {
     name: "exampleRestCall",
@@ -9,8 +11,12 @@ const step: RestCallStep = {
 }
 
 describe('restCallStep', () => {
+
+    const evaluator = defaultJexlInstance;
+    const messageResolver = new MessageResolver(evaluator);
+    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, evaluator);
+
     it('should make a rest call', async () => {
-        const stepRunner = StepRunner.createDemoStepRunner();
         const context: Context = {
             'inputRecord': {
                 'todoId': 1

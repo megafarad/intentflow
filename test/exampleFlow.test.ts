@@ -190,7 +190,7 @@ const exampleFlowConfig: FlowConfig = {
 
 describe('FlowEngine', () => {
     it('should properly run a flow', async () => {
-        const flowEngine = FlowEngine.create();
+        const flowEngine = FlowEngine.createDemoEngine();
         const tenantId = '1';
 
         const inputRecord: Record<string, any> = {
@@ -261,7 +261,7 @@ describe('FlowEngine', () => {
     }, 10000);
 
     it('should properly run a flow with a repeat', async () => {
-        const flowEngine = FlowEngine.create();
+        const flowEngine = FlowEngine.createDemoEngine();
         const tenantId = '1';
         const inputRecord: Record<string, any> = {
             clinicName: 'Sunshine Medical',

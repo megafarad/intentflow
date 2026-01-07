@@ -1,9 +1,15 @@
 import {StepRunner} from "../src/engine/stepRunner";
 import {SetDataStep} from "../src";
+import {defaultJexlInstance} from "../src/data/defaultJexlInstance";
+import {MessageResolver} from "../src/render/messageResolver";
 
 describe('SetDataStep', () => {
+
+    const evaluator = defaultJexlInstance;
+    const messageResolver = new MessageResolver(evaluator);
+    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, evaluator);
+
     it('should set data with a parseSmartDate call', async () => {
-        const stepRunner = StepRunner.createDemoStepRunner();
         const step: SetDataStep = {
             type: 'setData',
             name: 'setData',
@@ -30,7 +36,6 @@ describe('SetDataStep', () => {
     });
 
     it('should process undefined variable', async () => {
-        const stepRunner = StepRunner.createDemoStepRunner();
         const step: SetDataStep = {
             type: 'setData',
             name: 'setData',
@@ -53,7 +58,6 @@ describe('SetDataStep', () => {
     });
 
     it('should process getSpokenDate call', async () => {
-        const stepRunner = StepRunner.createDemoStepRunner();
         const step: SetDataStep = {
             type: 'setData',
             name: 'setData',
@@ -74,7 +78,6 @@ describe('SetDataStep', () => {
     });
 
     it('should process getSpokenTime call', async () => {
-        const stepRunner = StepRunner.createDemoStepRunner();
         const step: SetDataStep = {
             type: 'setData',
             name: 'setData',
@@ -95,7 +98,6 @@ describe('SetDataStep', () => {
     });
 
     it('should speak the time in the local time zone', async () => {
-        const stepRunner = StepRunner.createDemoStepRunner();
         const step: SetDataStep = {
             type: 'setData',
             name: 'setData',
