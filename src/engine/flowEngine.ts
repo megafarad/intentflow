@@ -5,6 +5,7 @@ import {
     MediaOutput, FlowExecutionOutput, FlowConfig, NoMediaOutput
 } from '../core/model';
 import {v7 as uuidv7} from 'uuid';
+import {Jexl} from "@pawel-up/jexl";
 import {MessageResolver} from "../render/messageResolver";
 import {StepRunner} from "./stepRunner";
 import {FlowLogger} from "../logging/flowLogger";
@@ -16,12 +17,17 @@ import {
     MakeCallStepHandler,
     PlayMessageStepHandler, RepeatGatherIntentStepHandler, RestCallHandler, SetDataHandler
 } from "./flowStepHandler";
-
+import {defaultJexlInstance} from "../data/defaultJexlInstance";
 
 export class FlowEngine {
 
-    constructor(private messageResolver: MessageResolver, private stepRunner: StepRunner) {
+    private stepResolver: StepResolver;
+    private readonly messageResolver: MessageResolver;
 
+    constructor(private stepRunner: StepRunner, private evaluator: Jexl) {
+
+        this.stepResolver = new StepResolver(this.evaluator);
+        this.messageResolver = new MessageResolver(this.evaluator);
     }
 
     public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, logger?: FlowLogger,
@@ -29,7 +35,7 @@ export class FlowEngine {
 
 
         //Get step
-        const step = StepResolver.findStep(flowConfig, stepName);
+        const step = this.stepResolver.findStep(flowConfig, stepName);
 
         //Process step
         const flowStepOutput = mediaOutput ? await this.stepRunner.runStep(tenantId,
@@ -52,11 +58,11 @@ export class FlowEngine {
             });
         }
 
-        const doRepeat = flowStepOutput ? await StepResolver.doRepeatStep(step, flowStepOutput, updatedContext) : false;
+        const doRepeat = flowStepOutput ? await this.stepResolver.doRepeatStep(step, flowStepOutput, updatedContext) : false;
 
-        const resolvedStep = doRepeat ? step : StepResolver.resolveStep(flowConfig, updatedContext, step,
+        const resolvedStep = doRepeat ? step : await this.stepResolver.resolveStep(flowConfig, updatedContext, step,
             flowStepOutput);
-        const nextStep: FlowStep | undefined = resolvedStep ? resolvedStep : (!stepName) ? StepResolver
+        const nextStep: FlowStep | undefined = resolvedStep ? resolvedStep : (!stepName) ? this.stepResolver
             .findInitialStep(flowConfig) : undefined
 
         //Get step instruction
@@ -110,7 +116,7 @@ export class FlowEngine {
                     break;
                 }
             case 'makeCall':
-                handler = new MakeCallStepHandler(this.messageResolver);
+                handler = new MakeCallStepHandler(this.messageResolver, this.evaluator);
                 break;
             case 'playMessage':
                 handler = new PlayMessageStepHandler(this.messageResolver);
@@ -131,6 +137,6 @@ export class FlowEngine {
     }
 
     public static create(): FlowEngine {
-        return new FlowEngine(new MessageResolver(), StepRunner.createDemoStepRunner());
+        return new FlowEngine(StepRunner.createDemoStepRunner(), defaultJexlInstance);
     }
 }

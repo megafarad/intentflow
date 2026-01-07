@@ -1,9 +1,13 @@
+import {Jexl} from "@pawel-up/jexl";
 import {Context, FlowConfig, FlowStep, FlowStepOutput} from "../core/model";
-import {jexlInstance} from "../data/jexlInstance";
 
 export class StepResolver {
 
-    public static findStep(flow: FlowConfig, stepName?: string) {
+    constructor(private evaluator: Jexl) {
+
+    }
+
+    public findStep(flow: FlowConfig, stepName?: string) {
         const foundStep = stepName ? flow.steps.find(step => step.name === stepName) :
             flow.steps.find(step =>  step.name === flow.initialStepName);
 
@@ -17,20 +21,17 @@ export class StepResolver {
         return foundStep;
     }
 
-    public static resolveStep(flow: FlowConfig, context: Context, flowStep: FlowStep, flowStepOutput?: FlowStepOutput) {
+    public async resolveStep(flow: FlowConfig, context: Context, flowStep: FlowStep, flowStepOutput?: FlowStepOutput) {
         if (flowStepOutput?.type === 'noMediaOutput' && flowStep.type === 'gatherIntent') {
             return flowStep;
         }
-        const matchingCondition = flowStep.outs ? Object.entries(flowStep.outs)
-            .find(([_, condition]) => {
-                try {
-                    return Boolean(jexlInstance.evalSync(condition, context));
-                } catch (err) {
-                    console.error(`Error evaluating condition for flow step ${flowStep.name}: ${condition}`);
-                    throw err;
-                }
 
-            }) : undefined;
+        const evaluations = flowStep.outs ? await Promise.all(Object.entries(flowStep.outs).map(async ([port, condition]) => {
+            const evaluation = await this.evaluator.evalAsBoolean(condition, context);
+            return [port, evaluation] as const;
+        })) : [];
+
+        const matchingCondition = evaluations.find(([_, evaluation]) => evaluation);
 
         if (matchingCondition) {
             const outPort = matchingCondition[0];
@@ -40,11 +41,10 @@ export class StepResolver {
         return undefined;
     }
 
-    public static async doRepeatStep(flowStep: FlowStep, flowStepOutput: FlowStepOutput, context: Context) {
+    public async doRepeatStep(flowStep: FlowStep, flowStepOutput: FlowStepOutput, context: Context) {
         if (flowStep.type === 'gatherIntent' && flowStepOutput.type === 'gatherIntent' && flowStep.repeat) {
             try {
-                const evaluation = await jexlInstance.eval(flowStep.repeat.condition, context);
-                const meetsCondition = Boolean(evaluation);
+                const meetsCondition = await this.evaluator.evalAsBoolean(flowStep.repeat.condition, context);
                 const maxAttempts = flowStepOutput.attempts >= flowStep.repeat.attempts;
                 return meetsCondition && !maxAttempts;
             } catch (err) {
@@ -54,7 +54,7 @@ export class StepResolver {
         } else return false;
     }
 
-    public static findInitialStep(flow: FlowConfig) {
+    public findInitialStep(flow: FlowConfig) {
         const initialStep = flow.steps.find(step => step.name === flow.initialStepName);
         if (!initialStep) {
             throw new FlowStepNotFoundError(`Flow step with name ${flow.initialStepName} not found`);

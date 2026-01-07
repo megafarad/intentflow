@@ -86,6 +86,6 @@ Thumbs.db
 *.tsbuildinfo
 
 # Optional lock files (pick based on package manager)
-package-lock.json
+# package-lock.json
 # yarn.lock
 # pnpm-lock.yaml

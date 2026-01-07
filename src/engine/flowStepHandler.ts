@@ -1,3 +1,4 @@
+import {Jexl} from "@pawel-up/jexl";
 import {
     Context,
     FlowInstruction,
@@ -7,7 +8,6 @@ import {
     PlayMessageStep
 } from "../core/model";
 import {MessageResolver} from "../render/messageResolver";
-import {jexlInstance} from "../data/jexlInstance";
 
 /**
  * Interface representing a handler for a step within a flow.
@@ -66,15 +66,15 @@ export class RepeatGatherIntentStepHandler implements FlowStepHandler {
 }
 
 export class MakeCallStepHandler implements FlowStepHandler {
-    constructor(private messageResolver: MessageResolver) {
+    constructor(private messageResolver: MessageResolver, private evaluator: Jexl) {
 
     }
 
     public async handle(flowStep: MakeCallStep, context: Context): Promise<FlowInstruction> {
-        const resolvedTo = await jexlInstance.eval(flowStep.to, context);
-        const resolvedFrom = await jexlInstance.eval(flowStep.from, context);
+        const resolvedTo = await this.evaluator.evalAsString(flowStep.to, context);
+        const resolvedFrom = await this.evaluator.evalAsString(flowStep.from, context);
         const resolvedCallAnnouncement = await this.messageResolver.resolveMessageText(flowStep.callAnnouncement, context);
-        const leaveAM = await jexlInstance.eval(flowStep.leaveAMCondition, context);
+        const leaveAM = await this.evaluator.evalAsBoolean(flowStep.leaveAMCondition, context);
         return {
             type: 'initiateCall',
             to: resolvedTo,

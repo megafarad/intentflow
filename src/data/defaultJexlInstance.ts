@@ -1,14 +1,15 @@
-import Jexl from 'jexl';
+import {Jexl} from "@pawel-up/jexl";
 import {DateTime} from "luxon";
 import {parseSmartDate} from "../inference/parseSmartDate";
 
 function buildJexlInstance() {
-    Jexl.addFunction('parseSmartDate', (input: string, anchorDateString: string, businessHourBias?: boolean) => {
+    const jexl = new Jexl();
+    jexl.addFunction('parseSmartDate', (input: string, anchorDateString: string, businessHourBias?: boolean) => {
         const anchorDate = DateTime.fromISO(anchorDateString);
         return parseSmartDate(input, anchorDate, businessHourBias);
     });
 
-    Jexl.addFunction('getSpokenDate', (isoDate: string, includeDayOfWeek?: boolean, locale?: string) => {
+    jexl.addFunction('getSpokenDate', (isoDate: string, includeDayOfWeek?: boolean, locale?: string) => {
         const date = DateTime.fromISO(isoDate, {setZone: true});
         if (includeDayOfWeek) {
             return date.toLocaleString(DateTime.DATE_HUGE, {locale: locale ?? 'en-US'});
@@ -17,12 +18,13 @@ function buildJexlInstance() {
         }
     });
 
-    Jexl.addFunction('getSpokenTime', (isoTime: string, locale?: string) => {
+    jexl.addFunction('getSpokenTime', (isoTime: string, locale?: string) => {
         const time = DateTime.fromISO(isoTime, {setZone: true});
         return time.toLocaleString(DateTime.TIME_SIMPLE, {locale: locale ?? 'en-US'});
     })
 
-    return Jexl;
+    return jexl;
+
 }
 
-export const jexlInstance = buildJexlInstance();
+export const defaultJexlInstance = buildJexlInstance();

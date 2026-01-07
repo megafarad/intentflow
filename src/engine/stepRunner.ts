@@ -13,13 +13,14 @@ import {OpenAIInferenceRunner} from "../inference/openAIInferenceRunner";
 import {OpenAIInferenceParser} from "../inference/openAIInferenceParser";
 import axios, {AxiosRequestConfig} from 'axios';
 import {SecretsManager, SimpleSecretsManager} from "../secrets/secretsManager";
-import {jexlInstance} from "../data/jexlInstance";
+import {Jexl} from "@pawel-up/jexl";
+import {defaultJexlInstance} from "../data/defaultJexlInstance";
 
 
 export class StepRunner {
 
     constructor(private messageResolver: MessageResolver, private inferenceRunner: InferenceRunner,
-                private secretsManager: SecretsManager) {
+                private secretsManager: SecretsManager, private evaluator: Jexl) {
 
     }
 
@@ -137,8 +138,8 @@ Respond with JSON only. Do not include any other text or markdown.
     }
 
     public static createDemoStepRunner() {
-        return new StepRunner(new MessageResolver(), OpenAIInferenceRunner
-            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager())
+        return new StepRunner(new MessageResolver(defaultJexlInstance), OpenAIInferenceRunner
+            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager(), defaultJexlInstance)
     }
 
     private async processSetDataStep(step: SetDataStep, context: Context): Promise<SetDataOutput> {
@@ -147,7 +148,7 @@ Respond with JSON only. Do not include any other text or markdown.
                 ...context,
                 'undefined': undefined
             }
-            const result = await jexlInstance.eval(expression, contextWithUndefined);
+            const result = await defaultJexlInstance.eval(expression, contextWithUndefined);
             const tuple: [string, any] = [key, result];
             return tuple;
         });
@@ -168,8 +169,8 @@ Respond with JSON only. Do not include any other text or markdown.
 
     private async processRestCallStep(tenantId: string, step: RestCallStep, context: Context): Promise<RestCallOutput> {
         const axiosInstance = axios.create({});
-        const restCallUrl = await jexlInstance.eval(step.url, context);
-        const resolvedBody =  step.body ? this.resolveRestCallBody(step.body, context) : undefined;
+        const restCallUrl = await this.evaluator.evalAsString(step.url, context);
+        const resolvedBody = step.body ? await this.resolveRestCallBody(step.body, context) : undefined;
         const stepHeaders = await this.resolveRestCallHeaders(tenantId, step.headers);
         const restCallHeaders = {
             ...stepHeaders,
@@ -213,19 +214,20 @@ Respond with JSON only. Do not include any other text or markdown.
         return undefined;
     }
 
-    private resolveRestCallBody(body: RestBody, context: Context): { [p: string]: any } {
-        const entries: ([string, any])[] = Object.entries(body).map(([key, value]) => {
+    private async resolveRestCallBody(body: RestBody, context: Context): Promise<{ [p: string]: unknown }> {
+        const entries = await Promise.all(Object.entries(body).map(async ([key, value]) => {
             if (value.type === 'static') {
-                const tuple: [string, any] = [key, value.value];
+                const tuple: [string, unknown] = [key, value.value];
                 return tuple;
             } else if (value.type === 'dynamic') {
-                const tuple: [string, any] = [key, jexlInstance.evalSync(value.expression, context)];
+                const tuple: [string, unknown] = [key, await this.evaluator.eval(value.expression, context)];
                 return tuple;
             } else {
-                const tuple: [string, any] = [key, this.resolveRestCallBody(value, context)];
+                const tuple: [string, unknown] = [key, await this.resolveRestCallBody(value, context)];
                 return tuple;
             }
-        });
+        }))
+
         return Object.fromEntries(entries);
     }
 }

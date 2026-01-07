@@ -1,5 +1,8 @@
 import {LLM} from "./llm";
 import {OpenAI as OpenAIApi} from 'openai';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export class OpenAILLM implements LLM {
 

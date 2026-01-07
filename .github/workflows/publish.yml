@@ -4,6 +4,10 @@ on:
     branches:
       - master
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -16,8 +20,8 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Generate package-lock.json
-        run: npm i
+      - name: Update NPM
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: npm ci
@@ -27,12 +31,8 @@ jobs:
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           DEMO_SECRET_1: ${{ secrets.DEMO_SECRET_1 }}
-
       - name: Build
         run: npm run build
 
       - name: Publish to NPM
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          access: 'restricted'
-          token: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
