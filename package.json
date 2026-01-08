@@ -1,6 +1,6 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -12,11 +12,14 @@
       "types": "./dist/index.d.ts",
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
+    },
+    "./schemas/FlowConfig.schema.json": {
+      "default": "./dist/schemas/FlowConfig.schema.json"
     }
   },
   "scripts": {
     "gen:schemas": "tjs-ajv-kit --include \"src/core/**/*.ts\" --types \"FlowConfig\" --id-prefix \"https://intentflow.megafarad.com/schemas/\" --out src/schemas",
-    "build": "tsup",
+    "build": "tsup && node scripts/copySchema.mjs",
     "test": "vitest run"
   },
   "repository": {
