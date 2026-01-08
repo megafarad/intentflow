@@ -1,6 +1,6 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -15,6 +15,7 @@
     }
   },
   "scripts": {
+    "gen:schemas": "tjs-ajv-kit --include \"src/core/**/*.ts\" --types \"FlowConfig\" --id-prefix \"https://intentflow.megafarad.com/schemas/\" --out src/schemas",
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist --clean",
     "test": "vitest run"
   },
@@ -27,12 +28,12 @@
   "license": "UNLICENSED",
   "description": "The engine behind OpeOpe's MemoMemo service.",
   "devDependencies": {
+    "@sirhc77/tjs-ajv-kit": "^0.2.0",
     "@types/lodash": "^4.17.21",
     "@types/luxon": "^3.7.1",
     "@types/node": "^25.0.3",
     "dotenv": "^17.2.3",
     "nodemon": "^3.1.11",
-    "ts-json-schema-generator": "^2.4.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",

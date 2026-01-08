@@ -37,8 +37,8 @@ export class FlowEngine {
         this.stepRunner = new StepRunner(this.messageResolver, inferenceRunner, secretsManger, this.evaluator);
     }
 
-    public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, logger?: FlowLogger,
-                          logSubscriberId?: string, stepName?: string, mediaOutput?: MediaOutput): Promise<FlowExecutionOutput> {
+    public async execStep(tenantId: string, flowConfig: FlowConfig, context: Context, stepName?: string,
+                          mediaOutput?: MediaOutput, loggerConfig?: {logger: FlowLogger, logSubscriberId: string}): Promise<FlowExecutionOutput> {
 
 
         //Get step
@@ -54,9 +54,9 @@ export class FlowEngine {
         } : context;
 
         if (flowStepOutput) {
-            await logger?.log({
+            await loggerConfig?.logger.log({
                 id: uuidv7(),
-                logSubscriberId: logSubscriberId,
+                logSubscriberId: loggerConfig?.logSubscriberId,
                 flowStep: step,
                 level: 'info',
                 event: 'step_output',
@@ -75,9 +75,9 @@ export class FlowEngine {
         //Get step instruction
         const nextFlowInstruction = await this.getFlowInstruction(updatedContext, doRepeat, nextStep);
 
-        await logger?.log({
+        await loggerConfig?.logger?.log({
             id: uuidv7(),
-            logSubscriberId: logSubscriberId,
+            logSubscriberId: loggerConfig?.logSubscriberId,
             flowStep: nextStep,
             level: 'info',
             event: 'next_step',
@@ -92,8 +92,8 @@ export class FlowEngine {
             const mediaOutput: NoMediaOutput = {
                 type: 'noMediaOutput'
             }
-            return this.execStep(tenantId, flowConfig, updatedContext, logger, logSubscriberId, nextStepName,
-                mediaOutput);
+            return this.execStep(tenantId, flowConfig, updatedContext, nextStepName,
+                mediaOutput, loggerConfig);
         } else {
             return {
                 nextInstruction: nextFlowInstruction,

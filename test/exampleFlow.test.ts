@@ -6,9 +6,6 @@ import {
     FlowEngine,
     NoMediaOutput
 } from "../src";
-import {ConsoleFlowLogger} from "../src";
-
-const logger = new ConsoleFlowLogger();
 
 const exampleFlowConfig: FlowConfig = {
     id: 'exampleFlowTest',
@@ -26,7 +23,7 @@ const exampleFlowConfig: FlowConfig = {
                 elements: [
                     {type: 'tts', text: 'This is '},
                     {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
-                    {type: 'tts',  text: ' calling with an important message.'},
+                    {type: 'tts', text: ' calling with an important message.'},
                 ]
             },
             outs: {
@@ -46,8 +43,8 @@ const exampleFlowConfig: FlowConfig = {
                 'a telephone call.',
             agentPrompt: {
                 elements: [
-                    {type: 'tts',  text: 'Is this '},
-                    {type: 'dynamic', sayAs: 'text',  expression: 'inputRecord.firstName'},
+                    {type: 'tts', text: 'Is this '},
+                    {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.firstName'},
                     {type: 'tts', text: ' '},
                     {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.lastName'},
                     {type: 'tts', text: '?'}
@@ -55,11 +52,18 @@ const exampleFlowConfig: FlowConfig = {
             },
             intents: [
                 {name: 'rightParty', criteria: 'Use this intent if the user identifies themselves as the right party.'},
-                {name: 'otherParty', criteria: 'Use this intent if the user indicates that they are not the right party.'},
-                {name: 'wrongHousehold', criteria: 'Use this intent if the user indicates that we have reached ' +
-                        'the wrong number/household.'},
-                {name: 'leaveMessage', criteria: 'Use this intent if the user offers to take a render for the ' +
-                        'right party.'},
+                {
+                    name: 'otherParty',
+                    criteria: 'Use this intent if the user indicates that they are not the right party.'
+                },
+                {
+                    name: 'wrongHousehold', criteria: 'Use this intent if the user indicates that we have reached ' +
+                        'the wrong number/household.'
+                },
+                {
+                    name: 'leaveMessage', criteria: 'Use this intent if the user offers to take a render for the ' +
+                        'right party.'
+                },
                 {name: 'other', criteria: 'Use this intent if the user says something else.'}
             ],
             outs: {
@@ -77,17 +81,26 @@ const exampleFlowConfig: FlowConfig = {
             agentPrompt: {
                 elements: [
                     {type: 'dynamic', sayAs: 'text', expression: 'inputRecord.clinicName'},
-                    {type: 'tts', text: ' cares about your privacy. To verify your identity, please say your date of ' +
-                            'birth.'}
+                    {
+                        type: 'tts',
+                        text: ' cares about your privacy. To verify your identity, please say your date of ' +
+                            'birth.'
+                    }
                 ]
             },
             intents: [
                 {name: 'authenticated', criteria: 'Use this intent if the user says their date of birth.'},
                 {name: 'otherParty', criteria: 'Use this intent if the user says they are not the right party.'},
-                {name: 'wrongHousehold', criteria: 'Use this intent if the user indicates that we have reached the ' +
-                        'wrong household.'},
-                {name: 'leaveMessage', criteria: 'Use this intent if the user offers to take a render for the right ' +
-                        'party.'},
+                {
+                    name: 'wrongHousehold',
+                    criteria: 'Use this intent if the user indicates that we have reached the ' +
+                        'wrong household.'
+                },
+                {
+                    name: 'leaveMessage',
+                    criteria: 'Use this intent if the user offers to take a render for the right ' +
+                        'party.'
+                },
                 {name: 'other', criteria: 'Use this intent if the user says something else.'}
             ],
             entityExtractionInstructions: 'If the user says their date of birth, extract the date of birth as a JSON ' +
@@ -97,7 +110,7 @@ const exampleFlowConfig: FlowConfig = {
                 'authenticated': 'authentication.intent == "authenticated" && authentication.entity.dateOfBirth == ' +
                     'inputRecord.dateOfBirth',
                 'authenticateFailed': 'authentication.intent == "authenticate" && authentication.entity.dateOfBirth != ' +
-                'inputRecord.dateOfBirth',
+                    'inputRecord.dateOfBirth',
                 'otherParty': 'authentication.intent == "otherParty"',
                 'wrongHousehold': 'authentication.intent == "wrongHousehold"',
                 'leaveMessage': 'authentication.intent == "leaveMessage"',
@@ -222,7 +235,7 @@ describe('FlowEngine', () => {
         }
 
         const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            firstFlowExecutionOutput.updatedContext, logger, "subscriber", firstFlowExecutionOutput.nextStepName, firstStepOutput);
+            firstFlowExecutionOutput.updatedContext, firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
         expect(secondFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
@@ -233,7 +246,7 @@ describe('FlowEngine', () => {
         }
 
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            secondFlowExecutionOutput.updatedContext, logger, "subscriber", secondFlowExecutionOutput.nextStepName, secondStepOutput);
+            secondFlowExecutionOutput.updatedContext, secondFlowExecutionOutput.nextStepName, secondStepOutput);
 
         expect(thirdFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
@@ -244,7 +257,7 @@ describe('FlowEngine', () => {
         }
 
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            thirdFlowExecutionOutput.updatedContext, logger, "subscriber", thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
+            thirdFlowExecutionOutput.updatedContext, thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
 
         expect(fourthFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
@@ -255,7 +268,7 @@ describe('FlowEngine', () => {
         }
 
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            fourthFlowExecutionOutput.updatedContext, logger, "subscriber", fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
+            fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
 
         expect(fifthFlowExecutionOutput.nextInstruction).toBe(undefined);
     }, 10000);
@@ -291,7 +304,7 @@ describe('FlowEngine', () => {
         }
 
         const secondFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            firstFlowExecutionOutput.updatedContext, logger, "subscriber", firstFlowExecutionOutput.nextStepName, firstStepOutput);
+            firstFlowExecutionOutput.updatedContext, firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
         expect(secondFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
@@ -302,7 +315,7 @@ describe('FlowEngine', () => {
         }
 
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            secondFlowExecutionOutput.updatedContext, logger, "subscriber", secondFlowExecutionOutput.nextStepName, secondStepOutput);
+            secondFlowExecutionOutput.updatedContext, secondFlowExecutionOutput.nextStepName, secondStepOutput);
 
         expect(thirdFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
@@ -312,7 +325,7 @@ describe('FlowEngine', () => {
             isReprompt: false
         }
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            thirdFlowExecutionOutput.updatedContext, logger, "subscriber", thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
+            thirdFlowExecutionOutput.updatedContext, thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
 
         expect(fourthFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
 
@@ -322,7 +335,7 @@ describe('FlowEngine', () => {
             isReprompt: false
         }
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            fourthFlowExecutionOutput.updatedContext, logger, "subscriber", fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
+            fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
 
         expect(fifthFlowExecutionOutput.nextInstruction?.type).toBe('repeat');
         expect(fifthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
@@ -332,7 +345,7 @@ describe('FlowEngine', () => {
         }
 
         const sixthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            fifthFlowExecutionOutput.updatedContext, logger, "subscriber", fifthFlowExecutionOutput.nextStepName, fifthStepOutput);
+            fifthFlowExecutionOutput.updatedContext, fifthFlowExecutionOutput.nextStepName, fifthStepOutput);
 
         expect(sixthFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
         expect(sixthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
@@ -344,7 +357,7 @@ describe('FlowEngine', () => {
         }
 
         const seventhFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            sixthFlowExecutionOutput.updatedContext, logger, "subscriber", sixthFlowExecutionOutput.nextStepName, sixthStepOutput);
+            sixthFlowExecutionOutput.updatedContext, sixthFlowExecutionOutput.nextStepName, sixthStepOutput);
 
         expect(seventhFlowExecutionOutput.nextInstruction).toBe(undefined);
 

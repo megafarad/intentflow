@@ -10,6 +10,7 @@
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": false,
+    "resolveJsonModule": true,
     "types": ["vitest/globals"]
   },
   "include": ["src"],

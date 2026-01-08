@@ -1,0 +1,404 @@
+{
+  "$ref": "#/definitions/FlowConfig",
+  "definitions": {
+    "FlowConfig": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "initialStepName": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FlowStep"
+          }
+        },
+        "links": {
+          "$ref": "#/definitions/Record<string,string>"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "initialStepName",
+        "links",
+        "name",
+        "steps"
+      ]
+    },
+    "FlowStep": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/GatherIntentStep"
+        },
+        {
+          "$ref": "#/definitions/MakeCallStep"
+        },
+        {
+          "$ref": "#/definitions/PlayMessageStep"
+        },
+        {
+          "$ref": "#/definitions/SetDataStep"
+        },
+        {
+          "$ref": "#/definitions/RestCallStep"
+        },
+        {
+          "$ref": "#/definitions/EndCallStep"
+        }
+      ]
+    },
+    "GatherIntentStep": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "gatherIntent"
+        },
+        "preamble": {
+          "type": "string"
+        },
+        "agentPrompt": {
+          "$ref": "#/definitions/Message"
+        },
+        "intents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Intent"
+          }
+        },
+        "entityExtractionInstructions": {
+          "type": "string"
+        },
+        "additionalInstructions": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "object",
+          "properties": {
+            "condition": {
+              "type": "string"
+            },
+            "message": {
+              "$ref": "#/definitions/Message"
+            },
+            "attempts": {
+              "type": "number"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "attempts",
+            "condition"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "outs": {
+          "$ref": "#/definitions/Record<string,string>"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "agentPrompt",
+        "intents",
+        "name",
+        "preamble",
+        "type"
+      ]
+    },
+    "Message": {
+      "type": "object",
+      "properties": {
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MessageElement"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "elements"
+      ]
+    },
+    "MessageElement": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DynamicElement"
+        },
+        {
+          "$ref": "#/definitions/TTSElement"
+        }
+      ]
+    },
+    "DynamicElement": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "dynamic"
+        },
+        "sayAs": {
+          "$ref": "#/definitions/SayAs"
+        },
+        "format": {
+          "type": "string"
+        },
+        "expression": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "expression",
+        "sayAs",
+        "type"
+      ]
+    },
+    "SayAs": {
+      "enum": [
+        "date",
+        "digits",
+        "number",
+        "text",
+        "time"
+      ],
+      "type": "string"
+    },
+    "TTSElement": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "tts"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "type"
+      ]
+    },
+    "Intent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "criteria": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "criteria",
+        "name"
+      ]
+    },
+    "Record<string,string>": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "MakeCallStep": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "makeCall"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "timeout": {
+          "type": "number"
+        },
+        "callAnnouncement": {
+          "$ref": "#/definitions/Message"
+        },
+        "leaveAMCondition": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "outs": {
+          "$ref": "#/definitions/Record<string,string>"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "callAnnouncement",
+        "from",
+        "leaveAMCondition",
+        "name",
+        "timeout",
+        "to",
+        "type"
+      ]
+    },
+    "PlayMessageStep": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "playMessage"
+        },
+        "message": {
+          "$ref": "#/definitions/Message"
+        },
+        "name": {
+          "type": "string"
+        },
+        "outs": {
+          "$ref": "#/definitions/Record<string,string>"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "message",
+        "name",
+        "type"
+      ]
+    },
+    "SetDataStep": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "setData"
+        },
+        "expressions": {
+          "$ref": "#/definitions/Record<string,string>"
+        },
+        "name": {
+          "type": "string"
+        },
+        "outs": {
+          "$ref": "#/definitions/Record<string,string>"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "expressions",
+        "name",
+        "type"
+      ]
+    },
+    "RestCallStep": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "restCall"
+        },
+        "url": {
+          "type": "string"
+        },
+        "headers": {
+          "$ref": "#/definitions/Headers"
+        },
+        "method": {
+          "enum": [
+            "DELETE",
+            "GET",
+            "POST",
+            "PUT"
+          ],
+          "type": "string"
+        },
+        "body": {
+          "$ref": "#/definitions/RestBody"
+        },
+        "name": {
+          "type": "string"
+        },
+        "outs": {
+          "$ref": "#/definitions/Record<string,string>"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "name",
+        "type",
+        "url"
+      ]
+    },
+    "Headers": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "RestBody": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "StaticRestBodyValue": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "static"
+        },
+        "value": {}
+      },
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "value"
+      ]
+    },
+    "DynamicRestBodyValue": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "dynamic"
+        },
+        "expression": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "expression",
+        "type"
+      ]
+    },
+    "EndCallStep": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "endCall"
+        },
+        "name": {
+          "type": "string"
+        },
+        "outs": {
+          "$ref": "#/definitions/Record<string,string>"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://intentflow.megafarad.com/schemas/FlowConfig.json"
+}
