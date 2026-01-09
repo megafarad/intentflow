@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {
     CallPromptOutput,
     FlowConfig,
@@ -206,7 +208,7 @@ describe('FlowEngine', () => {
         const flowEngine = FlowEngine.createDemoEngine();
         const tenantId = '1';
 
-        const inputRecord: Record<string, any> = {
+        const inputRecord: Record<string, string> = {
             clinicName: 'Sunshine Medical',
             firstName: 'Chris',
             lastName: 'Carrington',
@@ -276,7 +278,7 @@ describe('FlowEngine', () => {
     it('should properly run a flow with a repeat', async () => {
         const flowEngine = FlowEngine.createDemoEngine();
         const tenantId = '1';
-        const inputRecord: Record<string, any> = {
+        const inputRecord: Record<string, string> = {
             clinicName: 'Sunshine Medical',
             firstName: 'Chris',
             lastName: 'Carrington',

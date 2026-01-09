@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {LRUCache} from 'lru-cache';
 
 export interface SecretsManager {
@@ -20,16 +22,16 @@ export class EnvSecretProvider implements SecretProvider {
         return ref.startsWith('env:');
     }
 
-    async get(_tenantId: string, ref: string): Promise<Secret> {
+    get(_tenantId: string, ref: string): Promise<Secret> {
         const envVarName = ref.substring(4);
         const value = process.env[envVarName];
         if (!value) {
             throw new SecretNotFoundException(`Secret ${ref} not found`);
         }
-        return {
+        return Promise.resolve({
             value: value,
             ttlMs: 30_0000
-        };
+        });
     }
 }
 

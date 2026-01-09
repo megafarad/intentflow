@@ -1,4 +1,8 @@
-import {FlowStep} from "../core/model";
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
+import {FlowInstruction, FlowStep, FlowStepOutput} from "../core/model";
+
+export type LogData = Record<string, unknown> | FlowStepOutput | FlowInstruction;
 
 export interface LogEntry {
     id: string;
@@ -7,7 +11,7 @@ export interface LogEntry {
     level?: 'info' | 'warn' | 'error';
     message?: string;
     event?: string;
-    data?: Record<string, any>;
+    data?: LogData;
     timestamp: string;
 }
 

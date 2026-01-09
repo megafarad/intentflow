@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {StepRunner} from "../src/engine/stepRunner";
 import {CallPromptOutput, GatherIntentStep} from "../src";
 import {defaultJexlInstance} from "../src/data/defaultJexlInstance";

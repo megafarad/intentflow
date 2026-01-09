@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {Jexl} from "@pawel-up/jexl";
 import {DateTime} from "luxon";
 import {parseSmartDate} from "../inference/parseSmartDate";

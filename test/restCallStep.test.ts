@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {RestCallStep, Context, MediaOutput} from "../src";
 import {StepRunner} from "../src/engine/stepRunner";
 import {defaultJexlInstance} from "../src/data/defaultJexlInstance";
@@ -28,7 +30,15 @@ describe('restCallStep', () => {
         const stepOutput = await stepRunner.runStep('1', step, noMediaOutput, context);
         if (stepOutput.type === 'restCall') {
             expect(stepOutput.status).toBe(200);
-            expect(stepOutput.data.title).toBe('delectus aut autem');
+            if (typeof stepOutput.data !== 'object' || stepOutput.data === null) {
+                throw new Error('Unexpected data type');
+            }
+            if ('title' in stepOutput.data) {
+                expect(stepOutput.data.title).toBe('delectus aut autem');
+            } else {
+                throw new Error('Missing title field');
+            }
+
         } else {
             throw new Error('Unexpected step output');
         }

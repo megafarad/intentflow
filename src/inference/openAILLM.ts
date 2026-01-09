@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {LLM} from "./llm";
 import {OpenAI as OpenAIApi} from 'openai';
 import dotenv from 'dotenv';

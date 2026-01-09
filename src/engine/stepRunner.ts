@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {Jexl} from "@pawel-up/jexl";
 import {
     MediaOutput,
@@ -94,7 +96,7 @@ export class StepRunner {
         const userPrompt = callPromptOutput.utterance;
 
         const currentContext = context[step.name];
-        const recordedAttempts = currentContext && currentContext.attempts ? Number(currentContext.attempts) : 0;
+        const recordedAttempts = currentContext && 'attempts' in currentContext ? Number(currentContext.attempts) : 0;
         const currentAttempt = callPromptOutput.isReprompt ? recordedAttempts + 1 : 1;
 
 
@@ -197,13 +199,15 @@ Respond with JSON only. Do not include any other text or markdown.
         if (headers) {
             const resolvedHeadersPromises = Object.entries(headers).map(async ([key, value]) => {
                 switch (value.type) {
-                    case 'plain':
+                    case 'plain': {
                         const plainTuple: [string, string] = [key, value.value];
                         return plainTuple;
-                    case 'secret':
+                    }
+                    case 'secret': {
                         const resolvedSecret = await this.secretsManager.getSecret(tenantId, value.secretRef);
                         const secretTuple: [string, string] = [key, resolvedSecret];
                         return secretTuple;
+                    }
 
                 }
             });

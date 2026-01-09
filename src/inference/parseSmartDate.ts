@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import * as chrono from 'chrono-node';
 import {DateTime} from 'luxon';
 
@@ -21,7 +23,7 @@ export interface ParsedDateTimeRange {
     time?: ParsedTime;
 }
 
-export type EmptyParseResult = {}
+export type EmptyParseResult = object;
 
 export type ParseResult = ParsedDateTime | ParsedDateTimeRange | EmptyParseResult;
 

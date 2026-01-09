@@ -14,6 +14,8 @@ It’s published on NPM as `@sirhc77/intentflow`.
     - `makeCall`
     - `gatherIntent`
     - `playMessage`
+    - `setData`
+    - `restCall`
     - `endCall`
 - **Templated / dynamic message elements** (TTS + dynamic fields)
 - **Logging support** (exports a `FlowLogger` plus a console logger)
@@ -44,22 +46,56 @@ A minimal example:
   "id": "demo-flow",
   "name": "Demo Flow",
   "initialStepName": "welcome",
-  "links": {},
   "steps": [
+    {
+      "type": "makeCall",
+      "name": "makeCall",
+      "to": "inputRecord.phoneNumber",
+      "from": "inputRecord.callerId",
+      "timeout": 30,
+      "leaveAMCondition": "true",
+      "callAnnouncement": {
+        "elements": [
+          {
+            "type": "tts",
+            "text": "This is IntentFlow calling. Do not be alarmed."
+          }
+        ]
+      },
+      "outs": {
+        "liveAnswer": "makeCall.result == \"LA\"",
+        "answeringMachine": "makeCall.result == \"AM\"",
+        "noAnswer": "makeCall.result == \"NA\"",
+        "busy": "makeCall.result == \"B\"",
+        "deliveryFailure": "makeCall.result == \"DF\"",
+        "faxTone": "makeCall.result == \"FT\"",
+        "invalidAddress": "makeCall.result == \"IA\""
+      }
+    },
     {
       "type": "playMessage",
       "name": "welcome",
       "message": {
         "elements": [
-          { "type": "tts", "text": "Hello! Welcome to IntentFlow." }
+          {
+            "type": "tts",
+            "text": "This is only a test call. Thank you from IntentFlow."
+          }
         ]
+      },
+      "outs": {
+        "done": "true"
       }
     },
     {
-      "type": "endCall",
-      "name": "done"
+    "type": "endCall",
+    "name": "done"
     }
-  ]
+  ],
+  "links": {
+    "makeCall:liveAnswer": "welcome",
+    "welcome:done": "done"
+  }
 }
 ```
 > Note: Some step types support an `outs` object (a mapping of outcome → link name / next step reference depending on how you wire your flow). Keep your wiring consistent across `links` and each step’s `outs`.
@@ -79,10 +115,96 @@ IntentFlow’s public API is exported from `src/index.ts` (engine + core model +
   - Define a logger subscriber ID
 
 ```ts
-import { ConsoleFlowLogger, FlowEngine } from "@sirhc77/intentflow";
+import { ConsoleFlowLogger, FlowEngine, FlowConfig, Context, MakeCallStepOutput } from "@sirhc77/intentflow";
 
 const logger = new ConsoleFlowLogger();
 
+const engine = FlowEngine.createDemoEngine();
+
+const inputRecord: Record<string, string> = {
+  clinicName: 'Sunshine Medical',
+  firstName: 'Chris',
+  lastName: 'Carrington',
+  phoneNumber: '2065551234',
+  dateOfBirth: '1977-08-01',
+  appointmentDate: '2025-08-08',
+  appointmentTime: '10:00',
+  practitxioner: 'John Doe',
+}
+
+const initialContext: Context = {
+  'inputRecord': inputRecord
+}
+
+const flowConfig: FlowConfig = {
+    id: "demo-flow",
+    name: "Demo Flow",
+    initialStepName: "makeCall",
+    steps: [
+        {
+            type: "makeCall",
+            name: "makeCall",
+            to: "inputRecord.phoneNumber",
+            from: "inputRecord.callerId",
+            timeout: 30,
+            leaveAMCondition: "true",
+            callAnnouncement: {
+                elements: [
+                    {
+                        type: "tts",
+                        text: "This is IntentFlow calling. Do not be alarmed."
+                    }
+                ]
+            },
+            outs: {
+                "liveAnswer": "makeCall.result == \"LA\"",
+                "answeringMachine": "makeCall.result == \"AM\"",
+                "noAnswer": "makeCall.result == \"NA\"",
+                "busy": "makeCall.result == \"B\"",
+                "deliveryFailure": "makeCall.result == \"DF\"",
+                "faxTone": "makeCall.result == \"FT\"",
+                "invalidAddress": "makeCall.result == \"IA\""
+            }
+        },
+        {
+            type: "playMessage",
+            name: "welcome",
+            message: {
+                elements: [
+                    {
+                        type: "tts",
+                        text: "This is only a test call. Thank you from IntentFlow."
+                    }
+                ]
+            },
+            outs: {
+                "done": "true"
+            }
+        },
+        {
+            type: "endCall",
+            name: "done"
+        }
+    ],
+    links: {
+        "makeCall:liveAnswer": "welcome",
+        "welcome:done": "done"
+    }
+}
+
+const firstFlowExecutionOutput = await engine.execStep('1', flowConfig, initialContext);
+
+// firstFlowExecutionOutput.nextInstruction?.type === "initiateCall"
+// At this point, the flow engine is waiting for the user to answer the call. The developer should initiate the call, 
+// then execute the next step. For the purpose of demonstration, let's assume the call was answered.
+
+const firstStepOutput: MakeCallStepOutput = {
+    type: 'makeCall',
+    result: 'LA'
+}
+
+const secondFlowExecutionOutput = await engine.execStep('1', flowConfig, firstFlowConfigurationOutput.updatedContext,
+        firstFlowExecutionOutput.nextStepName, firstStepOutput);
 
 ```
 
@@ -117,6 +239,12 @@ Required:
 - **`playMessage`**
     - Required: `name`, `message`, `type: "playMessage"`
     - Optional: `outs`
+- **`setData`**
+    - Required: `name`, `expressions`, `type: "setData"`
+    - Optional: `outs`
+- **`restCall`**
+    - Required: `name`, `method`, `url`, `type: "restCall"`
+    - Optional: `outs`, `headers`, `body`
 - **`endCall`**
     - Required: `name`, `type: "endCall"`
     - Optional: `outs`
@@ -151,27 +279,22 @@ Use these to capture structured run information during execution (especially use
 ### Scripts
 
 Build:
-```
-bash
+```bash
 npm run build
 ```
 Test:
-```
-bash
+```bash
 npm test
 ```
 ---
 
 ## Environment variables
 
-The repository contains a `.env` file and depends on `dotenv`. If your flows use features that call external services (for example, OpenAI via the `openai` package), you’ll typically need environment variables like an API key.
+To use the OpenAI API, configure an environment variable:
 
-Use placeholders and keep secrets out of git:
+```bash
+OPENAI_KEY=<your_api_key_here>
 ```
-bash
-OPENAI_API_KEY=<your_api_key_here>
-```
-(Exact variable names depend on how your app wires dependencies into the engine.)
 
 ---
 
@@ -180,7 +303,7 @@ OPENAI_API_KEY=<your_api_key_here>
 - `src/engine/` — flow execution (engine, runner, resolver, handlers)
 - `src/core/` — shared types / model
 - `src/secrets/` — secret management utilities
-- `schema/` — JSON Schema for flow config
+- `src/schemas/` — JSON Schema for flow config
 - `test/` — Vitest test suite
 - `dist/` — build output (published)
 
@@ -188,7 +311,12 @@ OPENAI_API_KEY=<your_api_key_here>
 
 ## License
 
-This project is currently marked **UNLICENSED** in `package.json`. If you intend others to use it, consider adding an explicit license.
+This project is licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0-only).
+
+- You may use this library in proprietary applications.
+- If you modify the library itself and distribute the modified version, you must make those modifications available under LGPL-3.0.
+
+See the `LICENSE` file for details.
 
 ---
 
@@ -207,10 +335,4 @@ Issues and PRs are welcome—especially for:
 No—IntentFlow is a library. You embed it into your own Node.js/TypeScript services.
 
 ### Can I validate my flow config?
-Yes. Use `schema/flowConfig.schema.json` with your preferred JSON Schema validator.
-```
-
-
-If you want, I can also:
-- add a **complete “Working Example”** section once you confirm the intended public entrypoint (e.g., “create engine → run(initialData)”),
-- include **recommended validation tooling** (Ajv, etc.) and a short snippet showing how to validate configs against the provided schema.
+Yes. Use `schemas/flowConfig.schema.json` with your preferred JSON Schema validator.

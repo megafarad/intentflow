@@ -1,6 +1,6 @@
 {
   "name": "@sirhc77/intentflow",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -20,7 +20,8 @@
   "scripts": {
     "gen:schemas": "tjs-ajv-kit --include \"src/core/**/*.ts\" --types \"FlowConfig\" --id-prefix \"https://intentflow.megafarad.com/schemas/\" --out src/schemas",
     "build": "tsup && node scripts/copySchema.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -28,18 +29,23 @@
   },
   "keywords": [],
   "author": "Chris Carrington <chris@megafarad.com> (https://megafarad.com)",
-  "license": "UNLICENSED",
+  "license": "LGPL-3.0-only",
   "description": "The engine behind OpeOpe's MemoMemo service.",
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@sirhc77/tjs-ajv-kit": "^0.2.0",
     "@types/lodash": "^4.17.21",
     "@types/luxon": "^3.7.1",
     "@types/node": "^25.0.3",
     "dotenv": "^17.2.3",
+    "eslint": "^9.39.2",
+    "globals": "^17.0.0",
+    "jiti": "^2.6.1",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0",
     "vitest": "^4.0.16"
   },
   "dependencies": {
@@ -50,6 +56,7 @@
     "lru-cache": "^11.2.4",
     "luxon": "^3.7.2",
     "openai": "^6.15.0",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zod": "^4.3.5"
   }
 }

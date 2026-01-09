@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {Jexl} from "@pawel-up/jexl";
 import {
     Context,
@@ -106,10 +108,10 @@ export class SetDataHandler implements FlowStepHandler {
 
     }
 
-    public async handle(): Promise<FlowInstruction> {
-        return {
+    public handle(): Promise<FlowInstruction> {
+        return Promise.resolve({
             type: 'setData',
-        }
+        });
     }
 
 }
@@ -120,10 +122,10 @@ export class RestCallHandler implements FlowStepHandler {
 
     }
 
-    public async handle(): Promise<FlowInstruction> {
-        return {
+    public handle(): Promise<FlowInstruction> {
+        return Promise.resolve({
             type: 'restCall'
-        }
+        });
     }
 
 }
@@ -132,9 +134,9 @@ export class EndCallHandler implements FlowStepHandler {
     constructor() {
 
     }
-    public async handle(): Promise<FlowInstruction> {
-        return {
+    public handle(): Promise<FlowInstruction> {
+        return Promise.resolve({
             type: 'endCall'
-        }
+        });
     }
 }

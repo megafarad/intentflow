@@ -1,6 +1,10 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
+
 export type SayAs = 'date' | 'time' | 'number' | 'text' | 'digits';
 
-export type Context = Record<string, Record<string, any>>;
+export type ContextValue = FlowStepOutput | Record<string, unknown>;
+export type Context = Record<string, ContextValue>;
 
 export interface DynamicElement {
     type: 'dynamic';
@@ -34,7 +38,7 @@ export interface FlowStepBase {
 }
 
 export interface GatherIntentOutputEntity {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export interface GatherIntentOutput {
@@ -95,7 +99,7 @@ export interface SetDataStep extends FlowStepBase {
 
 export interface SuccessfulSetDataOutput {
     type: 'setDataSuccess';
-    data: Record<string, any>;
+    data: Record<string, unknown>;
 }
 
 export interface FailedSetDataOutput {
@@ -121,7 +125,7 @@ export type Headers = Record<string, HeaderValue>;
 
 export interface StaticRestBodyValue {
     type: 'static';
-    value: any;
+    value: unknown;
 }
 
 export interface DynamicRestBodyValue {
@@ -146,7 +150,7 @@ export interface RestCallStep extends FlowStepBase {
 export interface RestCallOutput {
     type: 'restCall';
     status: number;
-    data: any;
+    data: unknown;
     error?: Error;
 }
 
@@ -222,5 +226,5 @@ export interface FlowExecutionOutput {
 
 export interface InferredOutput {
     intent: string;
-    entity: Record<string, any>;
+    entity?: Record<string, unknown>;
 }

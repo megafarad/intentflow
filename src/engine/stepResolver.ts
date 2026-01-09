@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+// Copyright (c) 2026 Chris Carrington
 import {Jexl} from "@pawel-up/jexl";
 import {Context, FlowConfig, FlowStep, FlowStepOutput} from "../core/model";
 
@@ -31,7 +33,7 @@ export class StepResolver {
             return [port, evaluation] as const;
         })) : [];
 
-        const matchingCondition = evaluations.find(([_, evaluation]) => evaluation);
+        const matchingCondition = evaluations.find(([, evaluation]) => evaluation);
 
         if (matchingCondition) {
             const outPort = matchingCondition[0];
