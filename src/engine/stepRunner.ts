@@ -138,9 +138,9 @@ Respond with JSON only. Do not include any other text or markdown.
 `
     }
 
-    public static createDemoStepRunner(messageResolver: MessageResolver, evaluator: Jexl): StepRunner {
+    public static createDemoStepRunner(messageResolver: MessageResolver, apiKey: string, evaluator: Jexl): StepRunner {
         return new StepRunner(messageResolver, OpenAIInferenceRunner
-            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager(), evaluator);
+            .create(OpenAILLM.create('gpt-4o-mini', apiKey), OpenAIInferenceParser.create()), new SimpleSecretsManager(), evaluator);
     }
 
     private async processSetDataStep(step: SetDataStep, context: Context): Promise<SetDataOutput> {

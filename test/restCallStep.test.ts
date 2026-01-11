@@ -4,6 +4,16 @@ import {RestCallStep, Context, MediaOutput} from "../src";
 import {StepRunner} from "../src/engine/stepRunner";
 import {defaultJexlInstance} from "../src/data/defaultJexlInstance";
 import {MessageResolver} from "../src/render/messageResolver";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY environment variable is not set');
+}
+
+const apiKey = process.env.OPENAI_API_KEY;
+
 
 const step: RestCallStep = {
     name: "exampleRestCall",
@@ -16,7 +26,7 @@ describe('restCallStep', () => {
 
     const evaluator = defaultJexlInstance;
     const messageResolver = new MessageResolver(evaluator);
-    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, evaluator);
+    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, apiKey, evaluator);
 
     it('should make a rest call', async () => {
         const context: Context = {

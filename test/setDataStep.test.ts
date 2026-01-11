@@ -4,12 +4,21 @@ import {StepRunner} from "../src/engine/stepRunner";
 import {SetDataStep} from "../src";
 import {defaultJexlInstance} from "../src/data/defaultJexlInstance";
 import {MessageResolver} from "../src/render/messageResolver";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY environment variable is not set');
+}
+
+const apiKey = process.env.OPENAI_API_KEY;
 
 describe('SetDataStep', () => {
 
     const evaluator = defaultJexlInstance;
     const messageResolver = new MessageResolver(evaluator);
-    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, evaluator);
+    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, apiKey, evaluator);
 
     it('should set data with a parseSmartDate call', async () => {
         const step: SetDataStep = {

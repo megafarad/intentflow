@@ -4,6 +4,15 @@ import {StepRunner} from "../src/engine/stepRunner";
 import {CallPromptOutput, GatherIntentStep} from "../src";
 import {defaultJexlInstance} from "../src/data/defaultJexlInstance";
 import {MessageResolver} from "../src/render/messageResolver";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY environment variable is not set');
+}
+
+const apiKey = process.env.OPENAI_API_KEY;
 
 const gatherIntentStep: GatherIntentStep = {
     name: "gatherMainIntent",
@@ -74,7 +83,7 @@ describe('gatherIntentStep', () => {
 
     const evaluator = defaultJexlInstance;
     const messageResolver = new MessageResolver(evaluator);
-    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, evaluator);
+    const stepRunner = StepRunner.createDemoStepRunner(messageResolver, apiKey, evaluator);
 
     it('should gather the intent with an entity', async () => {
         const context = {
