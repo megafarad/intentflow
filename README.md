@@ -116,10 +116,15 @@ IntentFlow’s public API is exported from `src/index.ts` (engine + core model +
 
 ```ts
 import { ConsoleFlowLogger, FlowEngine, FlowConfig, Context, MakeCallStepOutput } from "@sirhc77/intentflow";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const logger = new ConsoleFlowLogger();
 
-const engine = FlowEngine.createDemoEngine();
+const apiKey = process.env.OPENAI_API_KEY;
+
+const engine = FlowEngine.createDemoEngine(apiKey);
 
 const inputRecord: Record<string, string> = {
   clinicName: 'Sunshine Medical',
@@ -286,17 +291,6 @@ Test:
 ```bash
 npm test
 ```
----
-
-## Environment variables
-
-To use the OpenAI API, configure an environment variable:
-
-```bash
-OPENAI_KEY=<your_api_key_here>
-```
-
----
 
 ## Project structure (high level)
 

@@ -29,7 +29,7 @@ jobs:
       - name: Run tests
         run: npm test
         env:
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DEMO_SECRET_1: ${{ secrets.DEMO_SECRET_1 }}
       - name: Build
         run: npm run build
