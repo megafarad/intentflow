@@ -29,8 +29,7 @@ export class OpenAILLM implements LLM {
         return response.output_text;
     }
 
-    public static create(model: string): OpenAILLM {
-        const apiKey = process.env.OPENAI_KEY!;
+    public static create(model: string, apiKey: string): OpenAILLM {
         return new OpenAILLM(apiKey, model);
     }
 

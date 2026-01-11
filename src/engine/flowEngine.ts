@@ -149,8 +149,8 @@ export class FlowEngine {
         return new FlowEngine(evaluator, inferenceRunner, secretsManager);
     }
 
-    public static createDemoEngine(): FlowEngine {
+    public static createDemoEngine(apiKey: string): FlowEngine {
         return new FlowEngine(defaultJexlInstance, OpenAIInferenceRunner
-            .create(OpenAILLM.create('gpt-4o-mini'), OpenAIInferenceParser.create()), new SimpleSecretsManager());
+            .create(OpenAILLM.create('gpt-4o-mini', apiKey), OpenAIInferenceParser.create()), new SimpleSecretsManager());
     }
 }

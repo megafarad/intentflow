@@ -8,6 +8,14 @@ import {
     FlowEngine,
     NoMediaOutput
 } from "../src";
+import dotenv from 'dotenv';
+dotenv.config();
+
+if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY environment variable is not set');
+}
+
+const apiKey = process.env.OPENAI_API_KEY;
 
 const exampleFlowConfig: FlowConfig = {
     id: 'exampleFlowTest',
@@ -205,7 +213,7 @@ const exampleFlowConfig: FlowConfig = {
 
 describe('FlowEngine', () => {
     it('should properly run a flow', async () => {
-        const flowEngine = FlowEngine.createDemoEngine();
+        const flowEngine = FlowEngine.createDemoEngine(apiKey);
         const tenantId = '1';
 
         const inputRecord: Record<string, string> = {
@@ -276,7 +284,7 @@ describe('FlowEngine', () => {
     }, 10000);
 
     it('should properly run a flow with a repeat', async () => {
-        const flowEngine = FlowEngine.createDemoEngine();
+        const flowEngine = FlowEngine.createDemoEngine(apiKey);
         const tenantId = '1';
         const inputRecord: Record<string, string> = {
             clinicName: 'Sunshine Medical',
