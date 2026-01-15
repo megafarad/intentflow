@@ -47,7 +47,7 @@ export class StepResolver {
         if (flowStep.type === 'gatherIntent' && flowStepOutput.type === 'gatherIntent' && flowStep.repeat) {
             try {
                 const meetsCondition = await this.evaluator.evalAsBoolean(flowStep.repeat.condition, context);
-                const maxAttempts = flowStepOutput.attempts >= flowStep.repeat.attempts;
+                const maxAttempts = flowStepOutput.attempt >= flowStep.repeat.attempts;
                 return meetsCondition && !maxAttempts;
             } catch (err) {
                 console.error(`Error evaluating condition for flow step ${flowStep.name}: ${flowStep.repeat.condition}`);

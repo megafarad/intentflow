@@ -44,8 +44,6 @@ export class StepRunner {
             case 'gatherIntent':
                 if (mediaOutput.type === 'callPrompt') {
                     return this.processGatherIntentStep(step, mediaOutput, context);
-                } else if (mediaOutput.type === 'noMediaOutput') {
-                    return mediaOutput;
                 } else {
                     throw new UnexpectedCallInstructionOutput(`Expected media output of type 'callPrompt' or 'noMediaOutput', but got ${mediaOutput.type} instead.`)
                 }
@@ -96,8 +94,8 @@ export class StepRunner {
         const userPrompt = callPromptOutput.utterance;
 
         const currentContext = context[step.name];
-        const recordedAttempts = currentContext && 'attempts' in currentContext ? Number(currentContext.attempts) : 0;
-        const currentAttempt = callPromptOutput.isReprompt ? recordedAttempts + 1 : 1;
+        const recordedAttempts = currentContext && 'attempt' in currentContext ? Number(currentContext.attempt) : 0;
+        const currentAttempt = recordedAttempts + 1;
 
 
         const inference = await this.inferenceRunner.run(systemPrompt, userPrompt);
@@ -107,7 +105,7 @@ export class StepRunner {
             intent: inference.intent,
             userPrompt: userPrompt,
             entity: inference.entity ?? {},
-            attempts: currentAttempt
+            attempt: currentAttempt
         }
 
     }

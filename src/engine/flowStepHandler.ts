@@ -38,7 +38,7 @@ export class GatherIntentStepHandler implements FlowStepHandler {
         const messageText = await this.messageResolver.resolveMessageText(flowStep.agentPrompt, context);
         return {
             type: 'callPrompt',
-            play: messageText
+            prompt: messageText
         }
     }
 
@@ -51,18 +51,13 @@ export class RepeatGatherIntentStepHandler implements FlowStepHandler {
 
     public async handle(flowStep: GatherIntentStep, context: Context): Promise<FlowInstruction> {
         //TODO: SSML & Audio Files
-        if (flowStep.repeat?.message) {
-            const messageText = await this.messageResolver.resolveMessageText(flowStep.repeat.message, context);
-            return {
-                type: 'repeat',
-                play: messageText
-            }
-        } else {
-            const messageText = await this.messageResolver.resolveMessageText(flowStep.agentPrompt, context);
-            return {
-                type: 'callPrompt',
-                play: messageText
-            }
+        const errorMessage = flowStep.repeat?.message ? await this.messageResolver.resolveMessageText(flowStep.repeat.message, context) : undefined;
+        const prompt = await this.messageResolver.resolveMessageText(flowStep.agentPrompt, context);
+
+        return {
+            type: 'repeat',
+            errorMessage: errorMessage,
+            prompt: prompt,
         }
     }
 }

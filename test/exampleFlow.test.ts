@@ -5,10 +5,10 @@ import {
     FlowConfig,
     MakeCallOutput,
     Context,
-    FlowEngine,
-    NoMediaOutput
+    FlowEngine
 } from "../src";
 import dotenv from 'dotenv';
+import {expect} from "vitest";
 dotenv.config();
 
 if (!process.env.OPENAI_API_KEY) {
@@ -252,7 +252,6 @@ describe('FlowEngine', () => {
         const secondStepOutput: CallPromptOutput = {
             type: 'callPrompt',
             utterance: "Yes.",
-            isReprompt: false
         }
 
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
@@ -263,7 +262,6 @@ describe('FlowEngine', () => {
         const thirdStepOutput: CallPromptOutput = {
             type: 'callPrompt',
             utterance: "August First Nineteen Seventy Seven",
-            isReprompt: false
         }
 
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
@@ -274,8 +272,7 @@ describe('FlowEngine', () => {
         const fourthStepOutput: CallPromptOutput = {
             type: 'callPrompt',
             utterance: "I can't make it. Can we do it next Friday?",
-            isReprompt: false
-        }
+       }
 
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
@@ -321,7 +318,6 @@ describe('FlowEngine', () => {
         const secondStepOutput: CallPromptOutput = {
             type: 'callPrompt',
             utterance: "Yes.",
-            isReprompt: false
         }
 
         const thirdFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
@@ -332,7 +328,6 @@ describe('FlowEngine', () => {
         const thirdStepOutput: CallPromptOutput = {
             type: 'callPrompt',
             utterance: "August First Nineteen Seventy Seven",
-            isReprompt: false
         }
         const fourthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             thirdFlowExecutionOutput.updatedContext, thirdFlowExecutionOutput.nextStepName, thirdStepOutput);
@@ -342,7 +337,6 @@ describe('FlowEngine', () => {
         const fourthStepOutput: CallPromptOutput = {
             type: 'callPrompt',
             utterance: "Is this for the dentist or the orthopedic surgeon?",
-            isReprompt: false
         }
         const fifthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
             fourthFlowExecutionOutput.updatedContext, fourthFlowExecutionOutput.nextStepName, fourthStepOutput);
@@ -350,26 +344,15 @@ describe('FlowEngine', () => {
         expect(fifthFlowExecutionOutput.nextInstruction?.type).toBe('repeat');
         expect(fifthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
 
-        const fifthStepOutput: NoMediaOutput = {
-            type: 'noMediaOutput',
-        }
-
-        const sixthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            fifthFlowExecutionOutput.updatedContext, fifthFlowExecutionOutput.nextStepName, fifthStepOutput);
-
-        expect(sixthFlowExecutionOutput.nextInstruction?.type).toBe('callPrompt');
-        expect(sixthFlowExecutionOutput.nextStepName).toBe('gatherMainIntent');
-
         const sixthStepOutput: CallPromptOutput = {
             type: 'callPrompt',
             utterance: "I can't make it. Can we do it next Friday?",
-            isReprompt: true
         }
 
-        const seventhFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
-            sixthFlowExecutionOutput.updatedContext, sixthFlowExecutionOutput.nextStepName, sixthStepOutput);
+        const sixthFlowExecutionOutput = await flowEngine.execStep(tenantId, exampleFlowConfig,
+            fifthFlowExecutionOutput.updatedContext, fifthFlowExecutionOutput.nextStepName, sixthStepOutput);
 
-        expect(seventhFlowExecutionOutput.nextInstruction).toBe(undefined);
+        expect(sixthFlowExecutionOutput.nextInstruction).toBe(undefined);
 
     }, 20000);
 });

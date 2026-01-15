@@ -45,14 +45,13 @@ export interface GatherIntentOutput {
     type: 'gatherIntent';
     userPrompt: string;
     intent: string;
-    attempts: number;
+    attempt: number;
     entity: GatherIntentOutputEntity;
 }
 
 export interface CallPromptOutput {
     type: 'callPrompt';
     utterance: string;
-    isReprompt?: boolean;
 }
 
 export interface GatherIntentStep extends FlowStepBase {
@@ -174,7 +173,7 @@ export interface FlowConfig {
 
 export interface CallPromptCallInstruction {
     type: 'callPrompt';
-    play: string;
+    prompt: string;
 }
 
 export interface InitiateCallInstruction {
@@ -203,16 +202,17 @@ export interface PlayInstruction {
     play: string;
 }
 
-export interface RepeatInstruction {
+export interface RepeatPromptInstruction {
     type: 'repeat';
-    play: string;
+    errorMessage?: string;
+    prompt?: string;
 }
 
 export type FlowInstruction =
     CallPromptCallInstruction
     | InitiateCallInstruction
     | PlayInstruction
-    | RepeatInstruction
+    | RepeatPromptInstruction
     | SetDataInstruction
     | RestCallInstruction
     | EndCallInstruction;
