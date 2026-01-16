@@ -67,15 +67,17 @@ export class FlowEngine {
             });
         }
 
-        const doRepeat = flowStepOutput ? await this.stepResolver.doRepeatStep(step, flowStepOutput, updatedContext) : false;
+        const doRepeat = flowStepOutput ? await this.stepResolver.doRepeatStep(step, flowStepOutput,
+            updatedContext) : false;
 
-        const resolvedStep = doRepeat ? step : await this.stepResolver.resolveStep(flowConfig, updatedContext, step,
-            flowStepOutput);
+        const resolvedStep = doRepeat ? step : await this.stepResolver.resolveStep(flowConfig,
+            updatedContext, step, flowStepOutput);
         const nextStep: FlowStep | undefined = resolvedStep ? resolvedStep : (!stepName) ? this.stepResolver
-            .findInitialStep(flowConfig) : undefined
+            .findInitialStep(flowConfig) : undefined;
 
         //Get step instruction
-        const nextFlowInstruction = await this.getFlowInstruction(updatedContext, doRepeat, nextStep);
+        const nextFlowInstruction = await this.getFlowInstruction(updatedContext, doRepeat,
+            nextStep);
 
         await loggerConfig?.logger?.log({
             id: uuidv7(),
@@ -90,12 +92,17 @@ export class FlowEngine {
         const nextStepName = nextStep?.name;
         const nextStepType = nextStep?.type;
 
+        const lastStepContext = updatedContext[step.name];
+        if (lastStepContext && 'attempt' in lastStepContext && nextFlowInstruction?.type !== 'repeat') {
+            lastStepContext.attempt = 1;
+            updatedContext[step.name] = lastStepContext;
+        }
+
         if (nextFlowInstruction?.type && ['setData', 'restCall'].includes(nextFlowInstruction?.type)) {
             const mediaOutput: NoMediaOutput = {
                 type: 'noMediaOutput'
             }
-            return this.execStep(tenantId, flowConfig, updatedContext, nextStepName,
-                mediaOutput, loggerConfig);
+            return this.execStep(tenantId, flowConfig, updatedContext, nextStepName, mediaOutput, loggerConfig);
         } else {
             return {
                 nextInstruction: nextFlowInstruction,
