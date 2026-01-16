@@ -205,7 +205,7 @@ export interface PlayInstruction {
 export interface RepeatPromptInstruction {
     type: 'repeat';
     errorMessage?: string;
-    prompt?: string;
+    prompt: string;
 }
 
 export type FlowInstruction =
