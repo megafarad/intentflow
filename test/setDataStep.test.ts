@@ -88,6 +88,26 @@ describe('SetDataStep', () => {
         }
     });
 
+    it('should process formatDate call', async () => {
+        const step: SetDataStep = {
+            type: 'setData',
+            name: 'setData',
+            expressions: {
+                'formattedDate': 'formatDate(inputRecord.appointmentDate, "EEEE, MMMM d")'
+            }
+        }
+        const stepOutput = await stepRunner.runStep('1', step, {type: 'noMediaOutput'}, {
+            inputRecord: {
+                appointmentDate: '2025-08-08'
+            }
+        });
+        if (stepOutput.type === 'setDataSuccess') {
+            expect(stepOutput.data.formattedDate).toBe('Friday, August 8');
+        } else {
+            throw new Error('Unexpected step output');
+        }
+    })
+
     it('should process getSpokenTime call', async () => {
         const step: SetDataStep = {
             type: 'setData',

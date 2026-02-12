@@ -11,6 +11,9 @@ function buildJexlInstance() {
         return parseSmartDate(input, anchorDate, businessHourBias);
     });
 
+    jexl.addFunction('formatDate', (isoDate: string, format: string) =>
+        (DateTime.fromISO(isoDate, {setZone: true}).toFormat(format)));
+
     jexl.addFunction('getSpokenDate', (isoDate: string, includeDayOfWeek?: boolean, locale?: string) => {
         const date = DateTime.fromISO(isoDate, {setZone: true});
         if (includeDayOfWeek) {
