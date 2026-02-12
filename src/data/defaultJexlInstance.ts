@@ -7,7 +7,7 @@ import {parseSmartDate} from "../inference/parseSmartDate";
 function buildJexlInstance() {
     const jexl = new Jexl();
     jexl.addFunction('parseSmartDate', (input: string, anchorDateString: string, businessHourBias?: boolean) => {
-        const anchorDate = DateTime.fromISO(anchorDateString);
+        const anchorDate = DateTime.fromISO(anchorDateString, {setZone: true});
         return parseSmartDate(input, anchorDate, businessHourBias);
     });
 
